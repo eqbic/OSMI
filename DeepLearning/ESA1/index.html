@@ -1,0 +1,87 @@
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>ESA 1</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather+Sans:wght@600&family=Orelega+One&display=swap" rel="stylesheet"> 
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.min.js"></script>
+  <script src="https://unpkg.com/ml5@latest/dist/ml5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+</head>
+
+<body> 
+  <div id="fakewindow" class="fakeWindow"></div>
+  <div class="container-xxl">
+
+    <div class="row">
+      <h1>ESA 1 Deep Learning: Bilderkennung</h1>
+    </div>
+
+    <div class="row">
+      <div class="col-6" id="uploadFile">
+        <label class="form-label" for="customFile">Upload Image:</label>
+      </div>
+    </div>
+
+    <div class="row gx-2">
+      <div class="col-6">
+        <div class="dashboardRegion">
+          <div class="dropzone-bg">
+            <div id="currentImage"></div>
+            <div id='dropzone'>
+              Drag & Drop your image here
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="dashboardRegion">
+          <canvas id="results" width="100" height="100"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="row" id="example-description">
+      <p>Choose one of these images:</p>
+    </div>
+
+    <div class="row gx-2" id="examples">
+        <img onclick="selectImage(this)" src="images/cat.png" class="thumbnail float-start">
+        <img onclick="selectImage(this)" src="images/horse.png" class="thumbnail mx-auto d-block">
+        <img onclick="selectImage(this)" src="images/toucan.png" class="thumbnail mx-auto d-block">
+        <img onclick="selectImage(this)" src="images/apple.png" class="thumbnail mx-auto d-block">
+        <img onclick="selectImage(this)" src="images/car.png" class="thumbnail mx-auto d-block">
+        <img onclick="selectImage(this)" src="images/chair.png" class="thumbnail float-end">
+    </div>
+
+    <div class="row">
+      <div class="col" id="documentation">
+        <h2>Dokumentation</h2>
+        <h3>Übersicht</h3>
+        <p>Auf dieser Seite können Bilder mithilfe des ml5.js Frameworks klassifiziert werden.
+            Der Nutzer hat dabei die Möglichkeit Bilder hochzuladen, per Drag&Drop in den markierten
+            Bereich zu ziehen oder eines der vorgeschlagenen Bilder auszuwählen. Neben dem Bild wird
+            anschließend ein Diagramm dargestellt. Aus diesem lassen sich die sechs wahrscheinlichsten 
+            Klassifikationen und deren Wahrscheinlichkeiten ablesen.
+        </p>
+        <h3>Verwendete Frameworks</h3>
+        <p>ml5.js, chart.js, p5.js, Bootstrap</p>
+        <h3>Bildquellen</h3>
+        <p>Katze: https://www.reddit.com/r/aww/comments/l3c3xi/cat/ <br>
+           Pferd: https://www.haustiermagazin.com/pferderassen/shire-horse/ <br>
+           Tukan: https://de.wikipedia.org/wiki/Tukane <br>
+           Apfel: https://ceklog.kindel.com/2013/02/19/why-nobody-can-copy-apple/ <br>
+           Auto: https://autoportal.com/newcars/marutisuzuki/ignis/ <br>
+           Stuhl: https://www.connox.de/kategorien/moebel/stuehle/frankfurter-stuhl.html</p>
+      </div>
+    </div>
+
+  </div>
+  <script src="sketch.js"></script>
+</body>
+
+</html>
