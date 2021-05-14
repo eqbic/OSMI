@@ -1,5 +1,5 @@
 class LIFNeuron{
-    constructor(u_rest = 0, u_threshold = 1, tau_rest = 4.0, r = 1.0, tau = 10.0){
+    constructor(u_rest = 0, u_threshold = 1, tau_rest = 4.0, r = 1.0, tau = 10.0, duration = 50.0){
         // Membrane resting potential in mV
         this.u_rest = u_rest;
         // Membrane threshold potential in mV
@@ -20,7 +20,12 @@ class LIFNeuron{
         // The chosen time interval for the stimulation in ms
         this.dt = 0.0;
 
+        this.duration = duration;
+
         this.hasFired = false;
+
+        this.as = [];
+        this.us = [];
     }
 
     get_integrating_op(){
@@ -57,33 +62,50 @@ class LIFNeuron{
             this.get_integrating_op();
         }
     }
+
+    update(){
+        if(this.as.length > this.duration){
+            this.as.shift();
+        }
+        this.as.push(this.i_input);
+
+        if(this.us.length > this.duration){
+            this.us.shift();
+        }
+        this.us.push(this.potential);
+    }
     
 }
 
 
 
 class Simulation{
-    constructor(start_time = 0.0, duration = 200.0, dt = 1, numberNeurons = 2){
+    constructor(start_time = 0.0, duration = 50.0, dt = 1, numberInputNeurons = 2, numberLayerNeurons = 3){
         
         this.start_time = start_time;
         this.duration = duration;
         this.dt = dt;
         
-
-        this.us = [];
         this.ts = [];
-        this.as = [];
-        this.threshold = []
 
         this.spike_times = [];
         this.voltage = 0.0;
         this.I_input = 0.0;
+
+
         this.inputNeurons = [];
+        this.layerNeurons = [];
+
         this.time = 0.0;
 
-        for(var i = 0; i < numberNeurons; i++){
-            var neuron = new LIFNeuron();
-            this.inputNeurons.push(neuron);
+        for(var i = 0; i < numberInputNeurons; i++){
+            var inputNeuron = new LIFNeuron();
+            this.inputNeurons.push(inputNeuron);
+        }
+
+        for(var i = 0; i < numberLayerNeurons; i++){
+            var layerNeuron = new LIFNeuron();
+            this.layerNeurons.push(layerNeuron);
         }
     }
 
@@ -91,8 +113,6 @@ class Simulation{
         
         if(this.ts.length > this.duration){
             this.ts.shift();
-            this.as.shift();
-            this.us.shift();
         }
         this.ts.push(this.time);
         
@@ -101,20 +121,17 @@ class Simulation{
         this.time += this.dt;
     }
 
-    simulateStep(time){
-        this.as.push(this.I_input);
-        this.us.push(this.voltage);
-        this.setRandomCurrent(time);
+    simulateStep(){
         this.inputNeurons.forEach(neuron => {
             this.simulateNeuron(neuron);
+            neuron.update();
         });
     }
 
     simulateNeuron(neuron){
-        neuron.i_input = this.I_input;
+        neuron.i_input = this.setRandomCurrent();
         neuron.dt = this.dt;
         neuron.get_potential_op();
-        this.voltage = neuron.potential;
     }
 
     setCurrent(time){
@@ -149,11 +166,12 @@ class Simulation{
       }
 
     setRandomCurrent(){
-        this.I_input = this.randn_bm(-1,3,1);
+        var num = this.randn_bm(-1,3,1);
+        return num;
     }
 }
 
-var simulation = new Simulation();;
+var simulation = new Simulation();
 var neurons = [];
 
 var canvas;
@@ -164,27 +182,53 @@ function setup(){
     
     // PLOTS
     var current = [{
-        x: simulation.ts,
-        y: simulation.as,
+        x: simulation.inputNeurons[0].ts,
+        y: simulation.inputNeurons[0].as,
+        mode: 'lines',
         type: 'scatter'
     }];
 
     var potential = [{
-        x: simulation.ts,
-        y: simulation.us,
+        x: simulation.inputNeurons[1].ts,
+        y: simulation.inputNeurons[1].us,
+        mode: 'lines',
         type: 'scatter'
     }];
 
-    var layout = {
-        autosize: false,
-        width: 300,
-        height: 300
+    var current_layout = {
+        xaxis:{
+            title: {
+                text: 'Time'
+            }
+        },
+        yaxis:{
+            title:{
+                text: 'Input Current'
+            }
+        }
+    };
+
+    var potential_layout = {
+        title:{
+            text: 'Threshold = 1'
+        },
+        xaxis:{
+            title: {
+                text: 'Time'
+            }
+        },
+        yaxis:{
+            title:{
+                text: 'Membrane Potential',
+            },
+            range: [0, 1.2]
+        }
     };
     
-    Plotly.newPlot('CurrentPlotOne', [current], layout);
-    Plotly.newPlot('PotentialPlotOne', [potential], layout);
-    Plotly.newPlot('CurrentPlotTwo', [current], layout);
-    Plotly.newPlot('PotentialPlotTwo', [potential], layout);
+    Plotly.newPlot('CurrentPlotOne', [current],current_layout);
+    Plotly.newPlot('PotentialPlotOne', [potential], potential_layout);
+    Plotly.newPlot('CurrentPlotTwo', [current],current_layout);
+    Plotly.newPlot('PotentialPlotTwo', [potential], potential_layout);
 
     // CANVAS
      // Setup Canvas
@@ -193,30 +237,48 @@ function setup(){
      canvas = createCanvas(canvasWidth, canvasHeight);
      canvas.parent('#canvas');
      background(0,0,0,0);
-     console.log(neurons);
 }
 
-function animateInputNeurons(neuron, index){
-    circle(90,index * 400 + 90,80);
+function renderInputNeuron(neuron, index){
     fill(color(240,220,10));
     if(neuron.hasFired){
         fill(color(250,20,20));
     }
+    circle(90,index * 200 + 200,80);
+}
+
+function renderLayerNeuron(neuron, index){
+    fill(color(100,220,50));
+    if(neuron.hasFired){
+        fill(color(250,20,20));
+    }
+    circle(300, index * 150 + 150, 80);
 }
 
 function draw(){
     clear();
     background(222);
-    simulation.inputNeurons.forEach(animateInputNeurons);
+    drawConnections();
+    simulation.inputNeurons.forEach(renderInputNeuron);
+    simulation.layerNeurons.forEach(renderLayerNeuron);
+
 }
 
+function drawConnections(){
+    for(var i = 0; i < simulation.inputNeurons.length; i++){
+        for(var j = 0; j < simulation.layerNeurons.length; j++){
+            line(90, i * 200 + 200, 300, j * 150 + 150);
+        }
+    }
+}
 
 function updateChart(){
     simulation.update();
 
-    Plotly.restyle('CurrentPlotOne', 'y', [simulation.as]);
-    Plotly.restyle('PotentialPlotOne', 'y', [simulation.us]);
-    Plotly.restyle('CurrentPlotTwo', 'y', [simulation.as]);
-    Plotly.restyle('PotentialPlotTwo', 'y', [simulation.us]);
+    Plotly.restyle('CurrentPlotOne', 'y', [simulation.inputNeurons[0].as]);
+    Plotly.restyle('PotentialPlotOne', 'y', [simulation.inputNeurons[0].us]);
+    Plotly.restyle('CurrentPlotTwo', 'y', [simulation.inputNeurons[1].as]);
+    Plotly.restyle('PotentialPlotTwo', 'y', [simulation.inputNeurons[1].us]);
 }
-//setInterval(updateChart, 100);
+
+setInterval(updateChart, 100);
