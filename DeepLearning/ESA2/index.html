@@ -5,62 +5,122 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ESA2</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather+Sans:wght@600&family=Orelega+One&display=swap" rel="stylesheet"> 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
     
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
     <link rel="stylesheet" href="styles.css">
-  
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/p5@1.3.1/lib/p5.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="sketch.js"></script>
 </head>
 <body>
-    <div class="container-fluid">
+    <div class="container-xxl">
         <div class="row">
             <div class="col">
                 <h1>ESA 2 Deep Learning: Spiking Neurons</h1>
             </div>
         </div>
+        
         <div class="row">
             <div class="col-4">
-                <div class="row">
-                    <div class="col-6">
-                        <div id="CurrentPlotOne"></div>
+                <div class="card">
+                    <div class="card-body">
+                        <label id="speedLabel" for="speedRange" class="form-label">Speed</label>
+                        <input type="range" class="form-range" min="1" max="1000" step="1" id="speedRange">
+
+                        <label id="minCurrentLabel" for="minCurrentRange" class="form-label">Min Current</label>
+                        <input type="range" class="form-range" min="-1" max="2" step="1" id="minCurrentRange">
+
+                        <label id="maxCurrentLabel" for="maxCurrentRange" class="form-label">Max Current</label>
+                        <input type="range" class="form-range" min="2" max="6" step="1" id="maxCurrentRange">
+
+                        <button type="button" id="startButton" class="btn btn-success btn-lg">Start</button>
+                        <button type="button" id="resetButton" class="btn btn-outline-warning btn-lg">Reset</button>
                     </div>
-                    <div class="col-6">
-                        <div id="PotentialPlotOne"></div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-6">
-                        <div id="CurrentPlotTwo"></div>
-                    </div>
-                    <div class="col-6">
-                        <div id="PotentialPlotTwo"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-4">
-                <div id="canvas"></div>
-            </div>
-            <div class="col-4">
-                <div class="row">
-                    <div class="col-6"></div>
-                    <div class="col-6"></div>
-                </div>
-                <div class="row">
-                    <div class="col-6"></div>
-                    <div class="col-6"></div>
-                </div>
-                <div class="row">
-                    <div class="col-6"></div>
-                    <div class="col-6"></div>
                 </div>
 
             </div>
-        </div>
+
+            <div class="col-4" id="controls">
+                <div class="card">
+                    <div class="card-body">
+                        <label id="inputLabel" for="inputRange" class="form-label">Input Neurons</label>
+                        <input type="range" class="form-range" min="1" max="5" step="1" id="inputRange">
         
+                        <label id="outputLabel" for="outputRange" class="form-label">Output Neurons</label>
+                        <input type="range" class="form-range" min="1" max="10" step="1" id="outputRange">
+
+                        <label id="minWeightLabel" for="minWeightRange" class="form-label">Min Weight</label>
+                        <input type="range" class="form-range" min="0" max="1" step="0.1" id="minWeightRange">
+
+                        <label id="maxWeightLabel" for="maxWeightRange" class="form-label">Max Weight</label>
+                        <input type="range" class="form-range" min="1" max="3" step="0.1" id="maxWeightRange">
+
+
+                        <button type="button" id="weightButton" class="btn btn-primary">Shuffle Weights</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-4">
+                <div id="temp"></div> 
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-4" id="inputPlots">
+                <div class="col">
+                    <div id="InputCurrentPlot"></div>
+                </div>
+                <div class="col">
+                    <div id="InputPotentialPlot"></div>
+                </div>
+
+                
+            </div>
+        
+            <div class="col-4">
+                <div id="canvas"></div>
+            </div>
+        
+            <div class="col-4" >
+                <div id="OutputPlot"></div>
+            </div>
+                
+        </div>
+
+        <div id="description" class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <h2>Dokumentation</h2>
+                        <h3>Übersicht</h3>
+                        <p>In diesem Webprojekt wird die Funktionsweise eines Spiking Neural Network (SNN)
+                            Visuell dargestellt. Das Neuronenmodell ist an das Leaky Integrate and Fire (LIF) Modell 
+                            von Kaizou [1] angelehnt. <br>
+                            Input-Neuronen sind gelb dargestellt.<br>
+                            Output-Neuronen sind grün dargestellt.<br>
+                            Wenn ein Neuron den Membran-Threshold übersteigt, spikt es und wird rot markiert.<br>
+                            Der Membran-Threshold ist für alle Neuronen auf 1 festgelegt.
+
+                        </p>
+                        <h3>Bedienung</h3>
+                        <p>Über die Slider im oberen Bereich können verschiedene Parameter des Netwerkes eingestellt werden. 
+                            Dazu gehören die Simulationsgeschwindigkeit, die Grenzwerte des Eingangsstromes für die Input-Neuronen,
+                             die Anzahl der Input- und Output-Neuronen und die Grenzwerte für die Gewichtungen der Neuronenverbindungen.
+                        </p>
+                        <h3>Verwendetet Frameworks</h3>
+                        <p>p5.js, Bootstrap, plotly.js</p>
+                        <h3>Quellen</h3>
+                        <p>[1] http://www.kaizou.org/2018/07/lif-neuron-tensorflow.html</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
-<!-- <script src="simpleExample.js"></script> -->
 </body>
 </html>
