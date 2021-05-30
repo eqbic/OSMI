@@ -21,3 +21,24 @@ for(let x = 0; x < dataSetSize; x++){
 
 const trainData = {X:train_xs, Y:train_ys};
 const testData = {X:test_xs, Y:test_ys};
+
+
+const trainTensors = {
+    X: tf.tensor2d(trainData.X, [dataSetSize, 1]),
+    Y: tf.tensor2d(trainData.Y, [dataSetSize, 1]) 
+};
+
+const testTensors = {
+    X: tf.tensor2d(testData.X, [dataSetSize, 1]),
+    Y: tf.tensor2d(testData.Y, [dataSetSize, 1])
+};
+
+const model = tf.sequential();
+model.add(tf.layers.dense({inputShape: [1], units: 1}));
+model.compile({optimizer: 'sgd', loss: 'meanAbsoluteError'});
+
+(async function() {
+    await model.fit(trainTensors.X, trainTensors.Y, {epochs: 10});
+});
+
+model.evaluate(testTensors.X, testTensors.Y).print();
