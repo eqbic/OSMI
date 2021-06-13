@@ -7,6 +7,9 @@ sepal_length = iris_data['sepal_length'].to_numpy(dtype=np.float32)
 sepal_width = iris_data['sepal_width'].to_numpy(dtype=np.float32)
 iris_classes = iris_data['class'].to_numpy(dtype=np.str0)
 
+data = np.stack((sepal_length, sepal_width), axis=-1)
+
+
 # normalize all data
 def normalize_array(array):
     array_max = max(array)
@@ -16,6 +19,7 @@ def normalize_array(array):
         normalize_value = (value - array_min) / (array_max - array_min)
         normalized_array.append(normalize_value)
     return np.array(normalized_array)
-
-
+# print(iris_data)
+# print(sepal_width)
+print(data[0][1])
 
