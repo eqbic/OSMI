@@ -2,6 +2,7 @@ const input = document.getElementById('textInput');
 const bestPredictions = document.getElementById('bestPredictions');
 const buttons = bestPredictions.children;
 var text;
+
 buttons.forEach(button => {
     button.style.display ='none';
     button.addEventListener('click', event =>{
@@ -85,10 +86,6 @@ function tokenizerEncode(tokenizer, wordArray){
     return encoded;
 }
 
-async function loadModel(path){
-    let model = await tf.loadLayersModel(path);
-    return model;
-}
 
 function getJsonData(filePath) {
     var result = null;
