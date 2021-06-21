@@ -1,25 +1,29 @@
-import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
+from collections import Counter
 
-iris_data = pd.read_csv('iris.csv')
-sepal_length = iris_data['sepal_length'].to_numpy(dtype=np.float32)
-sepal_width = iris_data['sepal_width'].to_numpy(dtype=np.float32)
-iris_classes = iris_data['class'].to_numpy(dtype=np.str0)
+def euclidean_distance(x1, x2):
+    return np.sqrt(np.sum((x1 - x2) ** 2))
+class KNN:
+    def __init__(self, k=3):
+        self.k = k
+    
+    def fit(self, X, y):
+        self.X_train = X
+        self.y_train = y
 
-data = np.stack((sepal_length, sepal_width), axis=-1)
 
+    def predict(self, X):
+        predicted_labels = [self._predict(x) for x in X]
+        return np.array(predicted_labels) 
 
-# normalize all data
-def normalize_array(array):
-    array_max = max(array)
-    array_min = min(array)
-    normalized_array = []
-    for value in array:
-        normalize_value = (value - array_min) / (array_max - array_min)
-        normalized_array.append(normalize_value)
-    return np.array(normalized_array)
-# print(iris_data)
-# print(sepal_width)
-print(data[0][1])
+    def _predict(self,x):
+        # compute distances
+        distances = [euclidean_distance(x, x_train) for x_train in self.X_train]
 
+        # get k nearest samples, labels
+        k_indices = np.argsort(distances)[:self.k]
+        k_nearest_labels = [self.y_train[i] for i in k_indices]
+
+        # majority vode, most common class label
+        most_common = Counter(k_nearest_labels).most_common(1)
+        return most_common[0][0] 
