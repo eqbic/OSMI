@@ -1,20 +1,21 @@
 var circle = document.getElementById("circle");
 
 
-var files_array = [];
-var number_files = 24;
-var angle_delta = 15;
-var image_index = 0;
-var run_animation = false;
+var files = [];
+var fileCount = 24;
+var angleDelta = 15;
+var imageIndex = 0;
+var animationRunning = false;
 var intervalId = null;
+const image_path = 'img/circle/circle_';
 
-for (var i = 0; i < number_files; i++) {
-    var angle = (i * angle_delta).toString();
-    var image_name = 'img/circle_' + angle + '.png';
-    files_array.push(image_name);
+for (var i = 0; i < fileCount; i++) {
+    var angle = (i * angleDelta).toString();
+    var image_name = image_path + angle + '.png';
+    files.push(image_name);
 }
 
-circle.src = files_array[image_index];
+circle.src = files[imageIndex];
 
 document.addEventListener('keyup', (event) => {
     var name = event.key;
@@ -27,8 +28,8 @@ document.addEventListener('keyup', (event) => {
             RotateCircle(-1);
             break;
         case 'a':
-            run_animation = !run_animation;
-            if (run_animation) {
+            animationRunning = !animationRunning;
+            if (animationRunning) {
                 console.log("start animation")
                 intervalId = window.setInterval(function () {
                     RotateCircle(1);
@@ -46,6 +47,6 @@ document.addEventListener('keyup', (event) => {
 }, false);
 
 function RotateCircle(direction) {
-    image_index = (number_files + image_index + direction) % number_files;
-    circle.src = files_array[image_index];
+    imageIndex = (fileCount + imageIndex + direction) % fileCount;
+    circle.src = files[imageIndex];
 }
