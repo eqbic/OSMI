@@ -1,5 +1,58 @@
-#circle{
-    position: relative;
-    width: 100%;
+body{
+    margin: 30px;
+    font-family: 'Merriweather Sans', sans-serif;
+    color: #555555;
+}
+
+#controls{
+    width: auto;
     height: auto;
+    float: left;
+    margin-top: 10%;
+}
+
+#controls ul{
+    list-style-type: none;
+}
+
+#controls ul li{
+    margin: 2em;
+    font-size: 16pt;
+}
+
+#border {
+    float: left;
+    height: 642px;
+    width: 642px;
+    position: relative;
+    top: 50%;
+    left:40%;
+    transform:translate(-50%, -25%);
+}
+#windmill {
+    height: 512px;
+    width: 512px;
+    position: absolute;
+    top: 50%;
+    left:40%;
+    transform:translate(-50%,-10%);
+}
+
+#windmill img{
+    position: absolute;
+}
+
+
+
+#megaman{
+    width: 256px;
+    height: 256px;
+    margin: 2em auto;
+    background: transparent url('img/spritesheet/sprite.png') 0 0 no-repeat;
+    animation: sprite-animation 0.7s steps(6) infinite;
+    }
+    
+
+@keyframes sprite-animation {
+100% { background-position: -1536px 0 ; }
 }

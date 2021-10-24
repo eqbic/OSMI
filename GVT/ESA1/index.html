@@ -1,22 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather+Sans:wght@600&family=Orelega+One&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
     <link rel="stylesheet" href="style.css">
     <title>GVT-ESA 1</title>
 </head>
-<body>
-    <div class="container-xl">
-        <div class="row">
-            <div class="col-4">
-                <img id="circle" class="img-fluid"></img>
 
+<body>
+    <div class="container-xxl">
+        <h1>EA 1 - Interaktiv animierte Scheibe</h1>
+        <nav>
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" href="index.html">Circle Animation</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="sprite.html">Spritesheet Animation</a>
+                </li>
+            </ul>
+        </nav>
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title">Circle Animation</h3>
+                <div id="controls">
+                    <ul>
+                        <li><img src="img/L_button.png"> : turn left</li>
+                        <li><img src="img/R_button.png"> : turn right</li>
+                        <li><img src="img/A_button.png"> : toggle animation</li>
+                    </ul>
+                </div>
+                <div id="border">
+                    <img id="border" src="img/border.png">
+                    <div id="windmill">
+                        <img id="house" src="img/house.png">
+                        <!-- <img id="circle" src="img/house.png"> -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     <script src="script.js"></script>
 </body>
+
 </html>
