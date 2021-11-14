@@ -140,6 +140,9 @@ function generateTorus(gl, resolution) {
 
     let positions = [];
     var v = 0.5 * step - 1.0;
+
+    let r1 = Math.random() * 0.5 + 0.5;
+    let r2 = Math.random() * 0.25 + 0.1;
     for (var i = 0, x = 0, z = 0; i < resolution * resolution; i++, x++) {
         if (x == resolution) {
             x = 0;
@@ -147,8 +150,7 @@ function generateTorus(gl, resolution) {
             v = (z + 0.5) * step - 1.0;
         }
         let u = (x + 0.5) * step - 1.0;
-        let r1 = 0.75;
-        let r2 = 0.25;
+        
         let s = r1 + r2 * Math.cos(Math.PI * v);
 
         let pos_x = s * Math.sin(Math.PI * u) - 1.2;
