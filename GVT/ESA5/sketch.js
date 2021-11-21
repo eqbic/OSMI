@@ -302,46 +302,86 @@ class Cube extends Mesh {
 
 class Camera {
     constructor(FOV, zNear, zFar, radius) {
-        this.aspectRatio = gl.canvas.clientWidth / gl.canvas.clientHeight;
-        this.FOV = FOV * Math.PI / 180.0;
-        this.zNear = zNear;
-        this.zFar = zFar;
-        this.radius = radius;
-        this.position = vec3.create();
-        this.projectionMatrix = mat4.create();
-        mat4.perspective(this.projectionMatrix, this.FOV, this.aspectRatio, this.zNear, this.zFar);
+        this._aspectRatio = gl.canvas.clientWidth / gl.canvas.clientHeight;
+        this._FOV = FOV * Math.PI / 180.0;
+        this._zNear = zNear;
+        this._zFar = zFar;
+        this._radius = radius;
 
-        this.modelViewMatrix = mat4.create();
-        this.move([0, 2, radius]);
+        this._position = vec3.create();
 
-        this.lookAtPosition([0, 0, 0]);
+        this._projectionMatrix = mat4.create();
+        mat4.perspective(this._projectionMatrix, this._FOV, this._aspectRatio, this._zNear, this._zFar);
+
+        this._modelViewMatrix = mat4.create();
+        this._inverseModelViewMatrix = mat4.create();
+        this.move([0, 3, radius]);
+        this.lookAtPosition([0.0,0.0,0.0]);
+
+    }
+
+    set radius(radius){
+        this._radius = Math.max(0.1, radius);
+    }
+
+    get radius(){
+        return this._radius;
     }
 
     get projection() {
-        return this.projectionMatrix;
+        return this._projectionMatrix;
     }
 
     get view() {
-        return this.modelViewMatrix;
+        return this._modelViewMatrix;
+    }
+
+    get inverseView(){
+        return this._inverseModelViewMatrix;
+    }
+
+    get position(){
+        return this._position;
+    }
+
+    zoom(amount){
+        this.move([0.0, 0.0, -amount]);
     }
 
     move(direction) {
-        mat4.translate(this.modelViewMatrix, this.modelViewMatrix, direction);
-        vec3.add(this.position, this.position, direction);
+        mat4.translate(this._modelViewMatrix, this._modelViewMatrix, direction);
+        mat4.getTranslation(this._position, this._modelViewMatrix);
+        mat4.invert(this._inverseModelViewMatrix, this._modelViewMatrix);
+    }
+    
+    lookAtPosition(target) {
+        mat4.targetTo(this._modelViewMatrix, this._position, target, [0.0, 1.0, 0.0]);
+        mat4.invert(this._inverseModelViewMatrix, this._modelViewMatrix);
     }
 
     moveAlongCircle(angle) {
         let angle_rad = angle * Math.PI / 180;
         let destination = vec3.create();
-        vec3.rotateY(destination, this.position, [0.0, 0.0, 0.0], angle_rad);
+        vec3.rotateY(destination, this._position, [0.0, 0.0, 0.0], angle_rad);
+        
         let direction = vec3.create();
-        vec3.sub(direction, destination, this.position);
-        this.move(direction);
+        vec3.sub(direction, destination, this._position);
+        
+        this._modelViewMatrix[12] += direction[0];
+        this._modelViewMatrix[13] += direction[1];
+        this._modelViewMatrix[14] += direction[2];
+        mat4.getTranslation(this._position, this._modelViewMatrix);
+        this.lookAtPosition([0,0,0]);
+        mat4.invert(this._inverseModelViewMatrix, this._modelViewMatrix);
     }
 
-    lookAtPosition(target) {
-        mat4.lookAt(this.modelViewMatrix, this.position, target, [0.0, 1.0, 0.0]);
-    }
+    changeHeight(amount){
+        this._modelViewMatrix[13] += amount;
+        mat4.getTranslation(this._position, this._modelViewMatrix);
+        this.lookAtPosition([0,0,0]);
+        mat4.invert(this._inverseModelViewMatrix, this._modelViewMatrix);
+    }    
+
 }
 
 class Scene {
@@ -402,29 +442,44 @@ function main() {
     const scene = new Scene();
 
     gl.uniformMatrix4fv(projMat, false, scene.camera.projection);
-    gl.uniformMatrix4fv(viewMat, false, scene.camera.view);
+    gl.uniformMatrix4fv(viewMat, false, scene.camera.inverseView);
 
     scene.addMesh(new Grid(10, 4, 4));
     scene.addMesh(new Torus(150, 0.5, 0.25));
     scene.addMesh(new Cube(0.2));
     scene.draw(shaderProgram, solidColor, lineColor);
 
+    console.log(scene.camera.forward);
+    
     document.addEventListener('keydown', (e) => {
         if (e.key === "ArrowLeft") {
             scene.camera.moveAlongCircle(-5);
-            scene.camera.lookAtPosition([0.0, 0.0, 0.0]);
-            gl.uniformMatrix4fv(projMat, false, scene.camera.projection);
-            gl.uniformMatrix4fv(viewMat, false, scene.camera.view);
-            scene.draw(shaderProgram, solidColor, lineColor);
         }
 
         if (e.key === "ArrowRight") {
             scene.camera.moveAlongCircle(5);
-            scene.camera.lookAtPosition([0.0, 0.0, 0.0]);
-            gl.uniformMatrix4fv(projMat, false, scene.camera.projection);
-            gl.uniformMatrix4fv(viewMat, false, scene.camera.view);
-            scene.draw(shaderProgram, solidColor, lineColor);
         }
+
+        if(e.key === 'i' && vec3.distance([0,0,0], scene.camera.position) > 1){
+            scene.camera.zoom(0.5);
+        }
+
+        if(e.key === 'o'){
+            scene.camera.zoom(-0.5);
+        }
+
+        if(e.key === 'ArrowUp'){
+            scene.camera.changeHeight(0.1);
+        }
+
+        if(e.key === 'ArrowDown'){
+            scene.camera.changeHeight(-0.1);
+        }
+
+        gl.uniformMatrix4fv(projMat, false, scene.camera.projection);
+        
+        gl.uniformMatrix4fv(viewMat, false, scene.camera.inverseView);
+        scene.draw(shaderProgram, solidColor, lineColor);
     });
 }
 
