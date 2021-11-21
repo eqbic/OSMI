@@ -3,3 +3,8 @@ body{
     font-family: 'Merriweather Sans', sans-serif;
     color: #555555;
 }
+
+#controls{
+    margin: 1em;
+}
+

@@ -10,17 +10,32 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
     <link rel="stylesheet" href="style.css">
-    <title>GVT-ESA 4</title>
+    <title>GVT-ESA 5</title>
 </head>
 
 <body>
     <div class="container-xxl">
-        <h1>EA 4 - Parametrisierte Flächen</h1>
+        <h1>EA 5 - Kamerabewegung</h1>
         <div class="card">
             <div class="card-body">
-                <h3 class="card-title">Parametrisierte Flächen (F5 ändert die Parameter)</h3>
-                <canvas id="glCanvas" width="1200" height="600"></canvas>
+                <canvas id="glCanvas" width="1250" height="600"></canvas>
             </div>
+            <div class="card" id="controls">
+                <div class="card-body">
+                    <h2 class="card-title">Steuerung</h2>
+                    <p>Die Kamera schaut immer auf den Koordinatenurspung. Die Steuerung wurde gegenüber der Aufgabenstellung leicht angepasst, da die Taste 'D' sonst doppelt belegt gewesen
+                        wäre (für Zoom und Bewegung auf der XZ Ebene). Aus diesem Grund wurde die Zoomfunktion auf die Tasten 'I' und 'O' gelegt.
+                    </p>
+                    <p>WASD: Bewegung auf globaler XZ Ebene</p>
+                    <p>I: Zoom In</p>
+                    <p>O: Zoom Out</p>
+                    <p>Pfeiltaste Links/Rechts: Rotation auf Kreisbahn um Ursprung</p>
+                    <p>Pfeiltaste Oben/Unten: Bewegung auf Y-Achse</p>
+
+                </div>
+            </div>
+            
+
         </div>
     </div>
     <script src="libs/glMatrix/gl-matrix-min.js"></script>
