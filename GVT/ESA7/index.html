@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather+Sans:wght@600&family=Orelega+One&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
+    <title>GVT-ESA 7</title>
+</head>
+
+<body>
+    <div class="container-xxl">
+        <h1>EA 7 - Z-Buffer Visualisierung</h1>
+        <div class="card">
+            <div class="card-body">
+                <canvas id="glCanvas" width="1250" height="600"></canvas>
+            </div>
+            <div class="card" id="controls">
+                <div class="card-body">
+                    <h2 class="card-title">Steuerung</h2>
+                    <p>A/D: Rotieren der Kamera auf einer Kreisbahn um die Objekte</p>
+                    <p>W/S: Bewegen der Kamera auf der globalen Y-Achse</p>
+                    <p>I/O: Zoom</p>
+
+                </div>
+            </div>
+            
+
+        </div>
+    </div>
+    <script src="libs/glMatrix/gl-matrix-min.js"></script>
+    <script src="Camera.js"></script>
+    <script src="Vertex.js"></script>
+    <script src="Mesh.js"></script>
+    <script src="Grid.js"></script>
+    <script src="Sphere.js"></script>
+    <script src="Torus.js"></script>
+    <script src="Scene.js"></script>
+    <script src="sketch.js"></script>
+
+</body>
+
+</html>
