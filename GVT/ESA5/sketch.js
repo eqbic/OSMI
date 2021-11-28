@@ -94,7 +94,7 @@ class Torus extends Mesh {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this._indices), gl.STATIC_DRAW);
         
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._lineBuffer);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this._lineIndices), gl.STATIC_DRAW);
     }
     
@@ -112,7 +112,7 @@ class Torus extends Mesh {
         gl.uniform4fv(uColor, solidColor);
         gl.drawElements(gl.TRIANGLES, vertexCount, type, 0);
         
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._lineBuffer);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer);
         gl.uniform4fv(uColor, lineColor);
         gl.drawElements(gl.LINES, (4 * (this._resolution - 1) * (this._resolution - 1) + 2 * this._resolution), type, 0);
     }
@@ -177,7 +177,7 @@ class Grid extends Mesh {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this._indices), gl.STATIC_DRAW);
         
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._lineBuffer);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this._lineIndices), gl.STATIC_DRAW);
     }
     
@@ -196,7 +196,7 @@ class Grid extends Mesh {
         gl.drawElements(gl.TRIANGLES, vertexCount, type, 0);
         
         gl.uniform4fv(uColor, lineColor);
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._lineBuffer);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer);
         gl.drawElements(gl.LINES, (4 * (this._resolution - 1) * (this._resolution - 1) + 2 * this._resolution), type, 0);
     }
 }
@@ -342,7 +342,7 @@ class Cube extends Mesh {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this._indices), gl.STATIC_DRAW);
 
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._lineBuffer);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this._lineIndices), gl.STATIC_DRAW);
     }
 
@@ -358,7 +358,7 @@ class Cube extends Mesh {
         gl.uniform4fv(uColor, solidColor);
         gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._lineBuffer);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer);
         gl.uniform4fv(uColor, lineColor);
         gl.drawElements(gl.LINES, 24, gl.UNSIGNED_SHORT, 0);
 
