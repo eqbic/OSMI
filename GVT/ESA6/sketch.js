@@ -110,6 +110,31 @@ function toggleAnimation(e){
     if(e.code === "ArrowDown") speed -= 1;
 }
 
+function moveCamera(e) {
+    switch (e.code) {
+        case "KeyA":
+            scene.camera.moveAlongCircle(-1);
+            break;
+        case "KeyD":
+            scene.camera.moveAlongCircle(1);
+            break;
+        case "KeyS":
+            scene.camera.move([0, -0.5, 0]);
+            break;
+        case "KeyW":
+            scene.camera.move([0,0.5,0]);
+            break;
+        case "KeyI":
+            scene.camera.zoom(0.5);
+            break;
+        case "KeyO":
+            scene.camera.zoom(-0.5);
+            break;
+        default:
+            break;
+    }
+}
+
 function draw(timestamp){
 
     totalTime += speed;
@@ -152,6 +177,7 @@ function draw(timestamp){
 
 window.requestAnimationFrame(draw);
 window.addEventListener('keydown', toggleAnimation);
+window.addEventListener('keydown', moveCamera);
 
 
 

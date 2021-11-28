@@ -38,4 +38,30 @@ class Camera {
         mat4.invert(inverse, this.#viewMatrix);
         return inverse;
     }
+
+    zoom(amount){
+        this.move([0,0,-amount]);
+        
+    }
+
+    move(direction){
+        mat4.translate(this.#viewMatrix, this.#viewMatrix, direction);
+        mat4.getTranslation(this.#position, this.#viewMatrix);
+        mat4.targetTo(this.#viewMatrix, this.#position, this.#target, [0.0, 1.0, 0.0]);
+    }
+
+    moveAlongCircle(angle) {
+        let angle_rad = angle * Math.PI / 180;
+        let destination = vec3.create();
+        vec3.rotateY(destination, this.#position, [0.0, 0.0, 0.0], angle_rad);
+        
+        let direction = vec3.create();
+        vec3.sub(direction, destination, this.#position);
+        
+        this.#viewMatrix[12] += direction[0];
+        this.#viewMatrix[13] += direction[1];
+        this.#viewMatrix[14] += direction[2];
+        mat4.getTranslation(this.#position, this.#viewMatrix);
+        mat4.targetTo(this.#viewMatrix, this.#position, this.#target, [0.0, 1.0, 0.0]);
+    }
 }
