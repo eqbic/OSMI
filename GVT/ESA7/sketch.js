@@ -84,25 +84,50 @@ floor.uniformScale(20);
 
 const ring = new Torus(16, 32, lightGrey, darkGrey);
 scene.addMesh(ring);
-ring.setPosition([0, 2, 0]);
-ring.uniformScale(5);
+ring.setPosition([0, 0.8, 0]);
+ring.uniformScale(8);
 ring.rotate([-90, 0, 0]);
 
-const ball = new Sphere(16, lightGrey, darkGrey);
-scene.addMesh(ball);
-ball.setPosition([2.5, 3, 0]);
+const cube1 = new Cube(lightGrey, darkGrey);
+cube1.setPosition([4,2,0]);
+cube1.scale([0.5, 2,0.5]);
+scene.addMesh(cube1);
+
+const ball1 = new Sphere(16, lightGrey, darkGrey);
+scene.addMesh(ball1);
+ball1.setPosition([4, 4, 0]);
+
+const cube2 = new Cube(lightGrey, darkGrey);
+cube2.setPosition([-4,2,0]);
+cube2.scale([0.5, 2,0.5]);
+scene.addMesh(cube2);
 
 const ball2 = new Sphere(16, lightGrey, darkGrey);
 scene.addMesh(ball2);
-ball2.setPosition([-2.5, 3, 0]);
+ball2.setPosition([-4, 4, 0]);
+
+const cube3 = new Cube(lightGrey, darkGrey);
+cube3.setPosition([0,2,4]);
+cube3.scale([0.5, 2,0.5]);
+scene.addMesh(cube3);
 
 const ball3 = new Sphere(16, lightGrey, darkGrey);
 scene.addMesh(ball3);
-ball3.setPosition([0, 3, 2.5]);
+ball3.setPosition([0, 4, 4]);
+
+const cube4 = new Cube(lightGrey, darkGrey);
+cube4.setPosition([0,2,-4]);
+cube4.scale([0.5, 2,0.5]);
+scene.addMesh(cube4);
 
 const ball4 = new Sphere(16, lightGrey, darkGrey);
 scene.addMesh(ball4);
-ball4.setPosition([0, 3, -2.5]);
+ball4.setPosition([0, 4, -4]);
+
+
+
+
+
 
 scene.drawSolid(depthShaderProgram);
 // scene.drawWireframe(wireframeShaderProgram);
@@ -131,6 +156,7 @@ function moveCamera(e) {
             break;
     }
 scene.drawSolid(depthShaderProgram);
+// scene.drawWireframe(d);
 
 }
 window.addEventListener('keydown', moveCamera);

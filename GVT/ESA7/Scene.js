@@ -4,7 +4,7 @@ class Scene{
     
     constructor(){
         const resolution = [gl.canvas.clientWidth, gl.canvas.clientHeight];
-        this.#camera = new Camera(resolution, 45, 0.1, 100, [0, 5, 5], [0, 2, 0]);
+        this.#camera = new Camera(resolution, 45, 0.1, 100, [0, 7, 12], [0, 2, 0]);
         this.#meshes = [];
         gl.enable(gl.DEPTH_TEST);
         gl.depthFunc(gl.LEQUAL);

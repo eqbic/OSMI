@@ -13,15 +13,9 @@ class Sphere extends Mesh {
         var n = resolution;
         var m = resolution;
 
-        // Positions.
-        this._positions = new Float32Array(3 * (n + 1) * (m + 1));
-        // Normals.
-        this.normals = new Float32Array(3 * (n + 1) * (m + 1));
         // Index data.
-        this.indicesLines = new Uint16Array(2 * 2 * n * m);
-        var indicesLines = this.indicesLines;
-        this.indicesTris = new Uint16Array(3 * 2 * n * m);
-        var indicesTris = this.indicesTris;
+        var indicesLines = new Uint16Array(2 * 2 * n * m);
+        var indicesTris = new Uint16Array(3 * 2 * n * m);
 
         var du = 2 * Math.PI / n;
         var dv = Math.PI / m;
