@@ -3,7 +3,11 @@ class MeshLoader extends Mesh{
     constructor(path, solidColor, lineColor) {
         super(solidColor, lineColor);
         this.#objSource = this.loadOBJ(path);
-        this.createVertexData(this.#objSource);
+        this.vertexData = this.createVertexData(this.#objSource);
+        this._vertices = this.vertexData.vertices;
+        this._indices = this.vertexData.lineIndices;
+        this._lineIndices = this.vertexData.lineIndices;
+        this.setupMesh(this._vertices, this._indices, this._lineIndices);
     }
 
     loadOBJ(path){
@@ -13,33 +17,71 @@ class MeshLoader extends Mesh{
         return(req.status == 200) ? req.responseText : null;
     }
 
-
     createVertexData(objSource) {
         let lines = objSource.split(/\r?\n/);
         let positions = [];
         let normals = [];
-        let indices = [];
+        let faces = [];
         let texCoords = [];
         let lineIndices = [];
 
+        let vertices = [];
+
         lines.forEach(line => {
             let attrib = line.split(' ')[0];
+            let p = line.split(' ');
             if(attrib === 'v'){
-               positions.push(line);
+                let position =
+                    [
+                    parseFloat(p[1]),
+                    parseFloat(p[2]),
+                    parseFloat(p[3])
+                    ];
+                positions.push(position);
             }
             else if(attrib === 'vt'){
-                texCoords.push(line);
+                let texCoord =
+                    [
+                        parseFloat(p[1]),
+                        parseFloat(p[2]),
+                    ];
+                texCoords.push(texCoord);
             }
             else if(attrib === 'vn'){
-               normals.push(line);
+                let normal =
+                    [
+                        parseFloat(p[1]),
+                        parseFloat(p[2]),
+                        parseFloat(p[3])
+                    ];
+               normals.push(normal);
             }
             else if(attrib === 'f'){
-               indices.push(line);
+
+               faces.push(p[1]);
+               faces.push(p[2]);
+               faces.push(p[3]);
             }
         });
-        console.log(positions);
-        console.log(normals);
-        console.log(texCoords);
+        let indices = [];
+
+        faces.forEach((face, index) => {
+            let content = face.split('/');
+            let positionIndex = parseInt(content[0]) - 1;
+            let texCoordIndex = parseInt(content[1]) - 1;
+            let normalIndex = parseInt(content[2]) - 1;
+            let vertex = new Vertex(positions[positionIndex], normals[normalIndex]);
+            vertices.push(vertex);
+            indices.push(index);
+        });
+
+        let indicesTris = new Uint16Array(indices);
+
+        return{
+            vertices : vertices,
+            indices : indicesTris,
+            lineIndices : indicesTris
+        };
     }
 
 }

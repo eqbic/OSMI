@@ -79,7 +79,8 @@ class Mesh{
         const buffer = new ArrayBuffer(bytesPerVertex * vertices.length);
         const dataView = new DataView(buffer);
 
-        for(let i = 0; i < this._vertices.length; i++){
+        for(let i = 0; i < vertices.length; i++){
+            // console.log(i);
             dataView.setFloat32(bytesPerVertex * i,vertices[i].position[0], true);
             dataView.setFloat32(bytesPerVertex * i + 4, vertices[i].position[1], true);
             dataView.setFloat32(bytesPerVertex * i + 8, vertices[i].position[2], true);
