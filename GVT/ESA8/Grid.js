@@ -14,7 +14,7 @@ class Grid extends Mesh {
 
         for (var i = 0, x = 0, z = 0; i < resolution * resolution; i++, x++) {
             let position = [];
-            let normal = [0.0, 0.0, 1.0, 1.0];
+            let normal = [0.0, 1.0, 0.0, 1.0];
             if (x === resolution) {
                 x = 0;
                 z += 1;
