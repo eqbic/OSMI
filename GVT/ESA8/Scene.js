@@ -5,7 +5,7 @@ class Scene{
 
     constructor(){
         const resolution = [gl.canvas.clientWidth, gl.canvas.clientHeight];
-        this.#camera = new Camera(resolution, 45, 0.1, 100, [0, 2, 5], [0, 2, 0]);
+        this.#camera = new Camera(resolution, 45, 0.1, 100, [0, 2, 7], [0, 2, 0]);
         this.#meshes = [];
         this.#lights = [];
 
@@ -21,6 +21,10 @@ class Scene{
         return this.#lights;
     }
 
+    get Meshes(){
+        return this.#meshes;
+    }
+
     addMesh(mesh){
         this.#meshes.push(mesh);
     }
@@ -29,55 +33,30 @@ class Scene{
         this.#lights.push(light);
     }
 
-    drawSolid(solidShader){
+    draw(){
         this.#clear();
-        gl.useProgram(solidShader);
-        const projMat = gl.getUniformLocation(solidShader, "uProjection");
-        const viewMat = gl.getUniformLocation(solidShader, "uView");
-        const modelTransform = gl.getUniformLocation(solidShader, "uWorld");
-        gl.uniformMatrix4fv(projMat, false, this.#camera.projection);
-        gl.uniformMatrix4fv(viewMat, false, this.#camera.inverseView);
-
-        const ambient = gl.getUniformLocation(solidShader, "ambientColor");
-        gl.uniform3fv(ambient, [0.1, 0.2, 0.3]);
-
-        const numberLights = gl.getUniformLocation(solidShader, "NumberLights");
-        gl.uniform1i(numberLights, this.#lights.length);
-
-        this.#lights.forEach((light, index) => {
-
-            let position = gl.getUniformLocation(solidShader, `pointLights[${index}].position`);
-            let color = gl.getUniformLocation(solidShader, `pointLights[${index}].color`);
-            let strength = gl.getUniformLocation(solidShader, `pointLights[${index}].strength`);
-
-            gl.uniform3fv(position, light.Position);
-            gl.uniform3fv(color, light.Color);
-            gl.uniform1f(strength, light.Strength);
-        });
-
-
         this.#meshes.forEach(mesh => {
-            gl.uniformMatrix4fv(modelTransform, false, mesh.transformation);
-            mesh.draw(solidShader);
-        })
-    }
+            const shader = mesh.Shader;
+            shader.use();
 
-    drawWireframe(wireframeShader){
-        gl.useProgram(wireframeShader);
-        const projMat = gl.getUniformLocation(wireframeShader, "uProjection");
-        const viewMat = gl.getUniformLocation(wireframeShader, "uView");
-        const modelTransform = gl.getUniformLocation(wireframeShader, "uWorld");
-        gl.uniformMatrix4fv(projMat, false, this.#camera.projection);
-        gl.uniformMatrix4fv(viewMat, false, this.#camera.inverseView);
-        this.#meshes.forEach(mesh => {
-            gl.uniformMatrix4fv(modelTransform, false, mesh.transformation);
-            mesh.drawWireframe(wireframeShader);
-            mesh.resetTransform();
+            this.#lights.forEach((light, index) => {
+                shader.setVec3(`pointLights[${index}].position`, light.Position);
+                shader.setVec3(`pointLights[${index}].color`, light.Color);
+                shader.setFloat(`pointLights[${index}].strength`, light.Strength);
+            });
+
+            shader.setMat4("uProjection", this.#camera.projection);
+            shader.setMat4("uView", this.#camera.inverseView);
+            shader.setVec3("ambientColor", [0.1, 0.2, 0.3]);
+            shader.setInt("NumberLights", this.#lights.length);
+            shader.setMat4("uWorld", mesh.Transformation);
+
+            mesh.draw();
         })
     }
 
     #clear(){
-        gl.clearColor(1.0, 1.0, 1.0, 1.0);
+        gl.clearColor(0.1, 0.2, 0.3, 1.0);
         gl.clearDepth(1.0);
         gl.clear(gl.COLOR_BUFFER_BIT || gl.DEPTH_BUFFER_BIT);
     }

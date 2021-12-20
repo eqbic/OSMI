@@ -10,7 +10,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
     <link rel="stylesheet" href="style.css">
-    <title>GVT-ESA 7</title>
+    <title>GVT-ESA 8</title>
 </head>
 
 <body>
@@ -18,7 +18,7 @@
         <h1>EA 8 - Lichter auf Kreisbahn mit Toon Shading</h1>
         <div class="card">
             <div class="card-body">
-                <canvas id="glCanvas" width="1250" height="600"></canvas>
+                <canvas id="glCanvas" width="1200" height="600"></canvas>
             </div>
             <div class="card" id="controls">
                 <div class="card-body">
@@ -26,6 +26,8 @@
                     <p>A/D: Rotieren der Kamera auf einer Kreisbahn um die Objekte</p>
                     <p>W/S: Bewegen der Kamera auf der globalen Y-Achse</p>
                     <p>I/O: Zoom</p>
+                    <p>L: Start/Stop Rotation der Lichter</p>
+                    <p>G: Switch zwischen Diffuse/Toon Shading</p>
 
                 </div>
             </div>
@@ -34,8 +36,11 @@
         </div>
     </div>
     <script src="libs/glMatrix/gl-matrix-min.js"></script>
+    <script src="Animator.js"></script>
+    <script src="Entity.js"></script>
+    <script src="Shader.js"></script>
     <script src="Camera.js"></script>
-    <script src="Light.js"></script>
+    <script src="PointLight.js"></script>
     <script src="Vertex.js"></script>
     <script src="Mesh.js"></script>
     <script src="MeshLoader.js"></script>

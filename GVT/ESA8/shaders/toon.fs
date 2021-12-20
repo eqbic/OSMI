@@ -46,7 +46,6 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos)
 void main(){
 
         vec3 result = ambientColor;
-        float intensity = 0.0;
         vec3 normal = normalize(Normal.xyz);
         for(int i = 0; i < NumberLights; i++)
         {

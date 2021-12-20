@@ -1,20 +1,22 @@
 class MeshLoader extends Mesh{
     #objSource
-    constructor(path, solidColor, lineColor) {
-        super(solidColor, lineColor);
+    #vertices;
+    #indices;
+    #vertexData;
+    constructor(path, shader, color) {
+        super(shader, color);
         this.#objSource = this.loadOBJ(path);
-        this.vertexData = this.createVertexData(this.#objSource);
-        this._vertices = this.vertexData.vertices;
-        this._indices = this.vertexData.lineIndices;
-        this._lineIndices = this.vertexData.lineIndices;
-        this.setupMesh(this._vertices, this._indices, this._lineIndices);
+        this.#vertexData = this.createVertexData(this.#objSource);
+        this.#vertices = this.#vertexData.vertices;
+        this.#indices = this.#vertexData.indices;
+        this.setupMesh(this.#vertices, this.#indices);
     }
 
     loadOBJ(path){
         const req = new XMLHttpRequest();
         req.open("GET", path, false);
         req.send();
-        return(req.status == 200) ? req.responseText : null;
+        return(req.status === 200) ? req.responseText : null;
     }
 
     createVertexData(objSource) {
@@ -23,7 +25,6 @@ class MeshLoader extends Mesh{
         let normals = [];
         let faces = [];
         let texCoords = [];
-        let lineIndices = [];
 
         let vertices = [];
 
@@ -80,7 +81,6 @@ class MeshLoader extends Mesh{
         return{
             vertices : vertices,
             indices : indicesTris,
-            lineIndices : indicesTris
         };
     }
 

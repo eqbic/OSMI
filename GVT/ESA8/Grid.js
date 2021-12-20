@@ -1,13 +1,16 @@
 class Grid extends Mesh {
-    
-    constructor(resolution, solidColor, lineColor) {
-        super(solidColor, lineColor);
-        this._vertices = this.generateVertices(resolution);
-        const indexDict = this.generateIndices(resolution);
-        this.setupMesh(this._vertices, indexDict.indices, indexDict.lineIndices);
+    #vertices;
+    #indices;
+    #vertexData;
+    constructor(resolution,shader,color) {
+        super(shader, color);
+        this.#vertexData = this.createVertexData(resolution);
+        this.#vertices = this.#vertexData.vertices;
+        this.#indices = this.#vertexData.indices;
+        this.setupMesh(this.#vertices, this.#indices);
     }
 
-    generateVertices(resolution) {
+    createVertexData(resolution){
         let vertices = [];
         let pos_x, pos_y, pos_z;
         const step = 2 / resolution;
@@ -30,24 +33,16 @@ class Grid extends Mesh {
             vertices.push(new Vertex(position, normal));
 
         }
-        return vertices;
-    }
 
-    generateIndices(resolution) {
         let indices = [];
-        let lineIndices = [];
-        const vertexCount = this._vertices.length;
+        const vertexCount = vertices.length;
         for (var i = 0; i < vertexCount - 1; i++) {
-            
+
             if ((i + 1) % resolution === 0) {
-                lineIndices.push(i);
-                lineIndices.push(i + resolution);
                 continue;
             }
 
             if(i > vertexCount - resolution - 1){
-                lineIndices.push(i);
-                lineIndices.push(i+1);
                 continue;
             }
 
@@ -59,15 +54,11 @@ class Grid extends Mesh {
             indices.push(i + 1);
             indices.push(i + resolution + 1);
 
-            lineIndices.push(i);
-            lineIndices.push(i + 1);
-            lineIndices.push(i);
-            lineIndices.push(i + resolution);
         }
 
         return {
-            indices : new Uint16Array(indices), 
-            lineIndices : new Uint16Array(lineIndices)
+            vertices : vertices,
+            indices : new Uint16Array(indices)
         };
     }
 }

@@ -1,16 +1,16 @@
 class Cube extends Mesh {
-    constructor(solidColor, lineColor) {
-        super(solidColor, lineColor);
-        this.vertexData = this.createVertexData();
-        this._vertices = this.vertexData.vertices;
-        this._indices = this.vertexData.indices;
-        this._lineIndices = this.vertexData.lineIndices;
-        this.setupMesh(this._vertices, this._indices, this._lineIndices);
+    #vertices;
+    #indices;
+    #vertexData;
+    constructor(shader, color) {
+        super(shader, color);
+        this.#vertexData = this.createVertexData();
+        this.#vertices = this.#vertexData.vertices;
+        this.#indices = this.#vertexData.indices;
+        this.setupMesh(this.#vertices, this.#indices);
     }
 
     createVertexData() {
-        
-
         const positions = [
             // Front face
             -1.0, -1.0, 1.0,
@@ -71,7 +71,6 @@ class Cube extends Mesh {
             i += 3;
         }
 
-
         let indices = []
         for( var i = 0; i < 24;){
             indices.push(i);
@@ -85,24 +84,9 @@ class Cube extends Mesh {
 
         let indicesTris = new Uint16Array(indices);
 
-        let lineIndices = [];
-        for(var i = 0; i < 48;){
-            lineIndices.push(i);
-            lineIndices.push(i+1);
-            lineIndices.push(i+1);
-            lineIndices.push(i+2);
-            lineIndices.push(i+2);
-            lineIndices.push(i+3);
-            lineIndices.push(i+3);
-            lineIndices.push(i);
-            i += 4;
-        }
-        let indicesLines = new Uint16Array(lineIndices);
-
         return{
             vertices: vertices,
             indices: indicesTris,
-            lineIndices: indicesLines
         };
 
     }

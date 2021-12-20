@@ -1,3 +1,4 @@
+// include all glMatrix classes
 const mat2 = glMatrix.mat2;
 const mat2d = glMatrix.mat2d;
 const mat3 = glMatrix.mat3;
@@ -13,94 +14,60 @@ const vec4 = glMatrix.vec4;
 const canvas = document.getElementById('glCanvas');
 /** @type {WebGL2RenderingContext} */
 const gl = canvas.getContext('webgl2');
-
-// Shader Loading Utils
-
-function getShaderSource(url) {
-    let req = new XMLHttpRequest();
-    req.open("GET", url, false);
-    req.send();
-    return (req.status == 200) ? req.responseText : null;
-};
-
-function loadShader(gl, type, source) {
-    const shader = gl.createShader(type);
-    gl.shaderSource(shader, source);
-    gl.compileShader(shader);
-
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        alert('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
-        gl.deleteShader(shader);
-        return null;
-    }
-    return shader;
-}
-
-function initShaderProgram(gl, vsSource, fsSource) {
-    const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
-    const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
-
-    const shaderProgram = gl.createProgram();
-    gl.attachShader(shaderProgram, vertexShader);
-    gl.attachShader(shaderProgram, fragmentShader);
-    gl.linkProgram(shaderProgram);
-
-    if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-        alert('Unable to initialize the shader program: ' + gl.getProgramInfoLog(shaderProgram));
-        return null;
-    }
-
-    return shaderProgram;
-}
-
 if (!gl) {
     alert('Unable to initialize WebGL. Your browser or machine may not support it.');
 }
-
-const solidVertexShaderSource = getShaderSource('shaders/solid.vs');
-const solidFragmentShaderSource = getShaderSource('shaders/solid.fs');
-
-const wireframeVertexShaderSource = getShaderSource('shaders/wireframe.vs');
-const wireframeFragmentShaderSource = getShaderSource('shaders/wireframe.fs');
-
-const depthVertexShaderSource = getShaderSource('shaders/depth.vs');
-const depthFragmentShaderSource = getShaderSource('shaders/depth.fs');
-
-const diffuseVertexShaderSource = getShaderSource('shaders/diffuse.vs');
-const diffuseFragmentShaderSource = getShaderSource('shaders/diffuse.fs');
-
-const toonVertexShaderSource = getShaderSource('shaders/toon.vs');
-const toonFragmentShaderSource = getShaderSource('shaders/toon.fs');
-
-const solidShaderProgram = initShaderProgram(gl, solidVertexShaderSource, solidFragmentShaderSource);
-const wireframeShaderProgram = initShaderProgram(gl, wireframeVertexShaderSource, wireframeFragmentShaderSource);
-const depthShaderProgram = initShaderProgram(gl, depthVertexShaderSource, depthFragmentShaderSource);
-const diffuseShaderProgram = initShaderProgram(gl, diffuseVertexShaderSource, diffuseFragmentShaderSource);
-const toonShaderProgram = initShaderProgram(gl, toonVertexShaderSource, toonFragmentShaderSource);
-
 const red = [1.0, 0.0, 0.0, 1.0];
 const white = [1.0, 1.0, 1.0, 1.0];
 const lightGrey = [0.8, 0.8, 0.8, 1.0];
 const darkGrey = [0.4, 0.4, 0.4, 1.0];
 
+const toonShader = new Shader("shaders/toon.vs", "shaders/toon.fs");
+const diffuseShader = new Shader('shaders/diffuse.vs', 'shaders/diffuse.fs');
+
 const scene = new Scene();
 
-const floor = new Grid(20, red, white);
+const floor = new Grid(20, toonShader, white);
 scene.addMesh(floor);
-floor.uniformScale(20);
+floor.uniformscale(20);
 
-const mesh = new MeshLoader('models/monkey_smooth.obj', lightGrey, darkGrey);
-scene.addMesh(mesh);
-mesh.setPosition([0,3,0]);
+const monkey = new MeshLoader('models/monkey_smooth.obj', toonShader, white);
+scene.addMesh(monkey);
+monkey.Position = [0,2,0];
 
-const light = new Light([-5.0,5.0,0], [1.0, 0.3, 0.1], 1.0);
+const teapot = new MeshLoader('models/teapot.obj', toonShader, white);
+scene.addMesh(teapot);
+teapot.Position = [-2,0,0];
+teapot.uniformscale(0.5);
+teapot.rotate([0,-30,0]);
+
+const spot = new MeshLoader('models/spot.obj', toonShader, white);
+scene.addMesh(spot);
+spot.Position = [2,0,0];
+
+const torus = new Torus(32, 32, toonShader, white);
+scene.addMesh(torus);
+torus.rotate([90,0,0]);
+torus.Position = [0,3.5,0];
+torus.uniformscale(2);
+
+const light = new PointLight([1.0, 0.0, 0.0], 1.0);
 scene.addLight(light);
+light.Position = [0,4,4];
 
-const light2 = new Light([5.0,5.0,0], [0.1, 0.4, 0.8], 1.0);
+const light2 = new PointLight( [0.0, 1.0, 0.0], 1.0);
 scene.addLight(light2);
+light2.Position = [4,4,-4];
 
+const light3 = new PointLight([0.0, 0.0, 1.0], 1.0);
+scene.addLight(light3);
+light3.Position = [-4,4,-4];
 
-function moveCamera(e) {
+const animator = new Animator();
+
+let isToon = true;
+let lightsRotating = true;
+function processInput(e) {
     switch (e.code) {
         case "KeyA":
             scene.camera.moveAlongCircle(-5);
@@ -120,18 +87,37 @@ function moveCamera(e) {
         case "KeyO":
             scene.camera.zoom(-0.5);
             break;
+        case "KeyG":
+            if(isToon){
+                scene.Meshes.forEach(mesh => {
+                    mesh.Shader = diffuseShader;
+                });
+                isToon = false;
+            }else{
+                scene.Meshes.forEach(mesh => {
+                    mesh.Shader = toonShader;
+                });
+                isToon = true;
+            }
+            break;
+        case "KeyL":
+            lightsRotating = !lightsRotating;
+            break;
         default:
             break;
     }
 
 }
-window.addEventListener('keydown', moveCamera);
+window.addEventListener('keydown', processInput);
 
 function draw(){
-    scene.lights.forEach(light => {
-       light.moveAlongCircle(0.2);
-    });
-    scene.drawSolid(toonShaderProgram);
+    if(lightsRotating){
+        scene.lights.forEach(light => {
+           light.Position = animator.rotateAroundY(light.Position, 0.2, [0,0,0]);
+        });
+    }
+
+    scene.draw();
     window.requestIdleCallback(draw);
 }
 

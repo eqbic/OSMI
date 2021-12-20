@@ -1,12 +1,13 @@
 class Sphere extends Mesh {
-
-    constructor(resolution, solidColor, lineColor) {
-        super(solidColor, lineColor);
-        this.vertexData = this.createVertexData(resolution);
-        this._vertices = this.vertexData.vertices;
-        this._indices = this.vertexData.indices;
-        this._lineIndices = this.vertexData.lineIndices;
-        this.setupMesh(this._vertices, this._indices, this._lineIndices);
+    #vertices;
+    #indices;
+    #vertexData;
+    constructor(resolution, shader, color) {
+        super(shader, color);
+        this.#vertexData = this.createVertexData(resolution);
+        this.#vertices = this.#vertexData.vertices;
+        this.#indices = this.#vertexData.indices;
+        this.setupMesh(this.#vertices, this.#indices);
     }
 
     createVertexData(resolution) {
@@ -86,7 +87,6 @@ class Sphere extends Mesh {
         return {
             vertices: vertices,
             indices: indicesTris,
-            lineIndices: indicesLines
         };
     }
 }
