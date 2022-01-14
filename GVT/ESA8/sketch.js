@@ -12,6 +12,7 @@ const vec3 = glMatrix.vec3;
 const vec4 = glMatrix.vec4;
 
 const canvas = document.getElementById('glCanvas');
+
 /** @type {WebGL2RenderingContext} */
 const gl = canvas.getContext('webgl2');
 if (!gl) {
