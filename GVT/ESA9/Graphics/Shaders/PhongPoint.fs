@@ -2,8 +2,9 @@
 precision highp float;
 
 
-in vec4 Normal;
 in vec3 VertexWorldPosition;
+in vec4 Normal;
+in vec2 TexCoord;
 
 out vec4 FragColor;
 
@@ -18,9 +19,11 @@ struct PointLight
 uniform int NumberLights;
 uniform PointLight pointLights[MAX_NR_LIGHTS];
 
-uniform vec4 objectColor;
+uniform vec3 objectColor;
 uniform vec3 ambientColor;
 uniform vec3 viewPosition;
+
+uniform sampler2D texture;
 
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos)
 {
@@ -47,7 +50,8 @@ void main(){
         {
             result += CalcPointLight(pointLights[i], normal, VertexWorldPosition);
         }
-        result *= objectColor.rgb;
-        FragColor = vec4(result, 1.0);
+        result *= objectColor;
+        // test UV
+        FragColor = vec4(TexCoord[0], TexCoord[1], 0.0, 1.0);
 }
 

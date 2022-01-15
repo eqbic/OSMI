@@ -74,7 +74,7 @@ class MeshLoader extends Mesh{
             let positionIndex = parseInt(content[0]) - 1;
             let texCoordIndex = parseInt(content[1]) - 1;
             let normalIndex = parseInt(content[2]) - 1;
-            let vertex = new Vertex(positions[positionIndex], normals[normalIndex]);
+            let vertex = new Vertex(positions[positionIndex], normals[normalIndex], texCoords[texCoordIndex]);
             vertices.push(vertex);
             indices.push(index);
         });

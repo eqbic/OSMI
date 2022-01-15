@@ -1,15 +1,23 @@
 class Vertex{
-    constructor(position, normal){
-        this._position = position;
-        this._normal = normal;
+    #position;
+    #normal;
+    #texCoord;
+    constructor(position, normal, texCoord){
+        this.#position = position;
+        this.#normal = normal;
+        this.#texCoord = texCoord;
     }
 
-    get position(){
-        return this._position;
+    get Position(){
+        return this.#position;
     }
 
-    get normal(){
-        return this._normal;
+    get Normal(){
+        return this.#normal;
+    }
+
+    get TexCoord(){
+        return this.#texCoord;
     }
 }
 

@@ -4,32 +4,25 @@ class Canvas{
     #gl;
     #width;
     #height;
-    constructor(id, parent, width, height) {
+    #canvas;
 
+    constructor(id, parent) {
         this.#id = id;
         this.#parent = parent;
-        this.#width = width;
-        this.#height = height;
+        this.#width = parent.clientWidth;
+        this.#height = parent.clientHeight;
 
         let divWrapper = document.createElement('div');
-        let canvasElem = document.createElement('canvas');
+        this.#canvas = document.createElement('canvas');
         this.#parent.appendChild(divWrapper);
-        divWrapper.appendChild(canvasElem);
+        divWrapper.appendChild(this.#canvas);
 
         divWrapper.id = this.#id;
-        canvasElem.width = this.#width;
-        canvasElem.height = this.#height;
+        this.#canvas.width = this.#width;
+        this.#canvas.height = this.#height;
 
         /** @type {WebGL2RenderingContext} */
-        this.#gl = canvasElem.getContext('webgl2');
-    }
-
-    get Height(){
-        return this.#height;
-    }
-
-    get Width(){
-        return this.#width;
+        this.#gl = this.#canvas.getContext('webgl2');
     }
 
     get GL(){

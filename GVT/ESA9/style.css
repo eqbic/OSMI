@@ -1,10 +1,20 @@
 body{
     margin: 30px;
-    font-family: 'Merriweather Sans', sans-serif;
-    color: #555555;
+    color: #ffffff;
+    background-color: #262b30;
 }
 
 #controls{
-    margin: 1em;
 }
 
+#renderer{
+    min-height: 600px;
+}
+
+#all{
+    border: 1px solid blue;
+}
+
+#main-container{
+    height: 100%;
+}
