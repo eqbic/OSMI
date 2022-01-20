@@ -23,6 +23,8 @@ class Canvas{
 
         /** @type {WebGL2RenderingContext} */
         this.#gl = this.#canvas.getContext('webgl2');
+        this.#gl.enable(this.#gl.DEPTH_TEST);
+        this.#gl.depthFunc(this.#gl.LEQUAL);
     }
 
     get GL(){

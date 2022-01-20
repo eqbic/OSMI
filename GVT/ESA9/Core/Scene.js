@@ -2,7 +2,7 @@ import {Camera} from "../Camera/Camera.js";
 let gl;
 class Scene{
     #camera;
-    #meshes;
+    #models;
     #lights;
     #ambientColor;
 
@@ -11,12 +11,11 @@ class Scene{
         gl = glContext;
         const resolution = [gl.canvas.clientWidth, gl.canvas.clientHeight];
         this.#camera = new Camera(resolution, 45, 0.1, 100, [0, 2, 5], [0, 0, 0]);
-        this.#meshes = [];
+        this.#models = [];
         this.#lights = [];
         this.#ambientColor = ambientColor;
 
-        gl.enable(gl.DEPTH_TEST);
-        gl.depthFunc(gl.LEQUAL);
+
 
     }
 
@@ -24,15 +23,19 @@ class Scene{
         return this.#lights;
     }
     get Meshes(){
-        return this.#meshes;
+        return this.#models;
     }
 
     get Camera() {
         return this.#camera;
     }
 
-    addMesh(mesh){
-        this.#meshes.push(mesh);
+    get AmbientColor(){
+        return this.#ambientColor;
+    }
+
+    addModel(model){
+        this.#models.push(model);
     }
 
     addLight(light){
@@ -41,25 +44,8 @@ class Scene{
 
     draw(){
         this.#clear();
-        this.#meshes.forEach(mesh => {
-            const shader = mesh.Shader;
-            shader.use();
-
-            this.#lights.forEach((light, index) => {
-                shader.setVec3(`pointLights[${index}].position`, light.Position);
-                shader.setVec3(`pointLights[${index}].color`, light.Color);
-                shader.setFloat(`pointLights[${index}].strength`, light.Strength);
-            });
-
-            shader.setMat4("uProjection", this.#camera.Projection);
-            shader.setMat4("uView", this.#camera.InverseView);
-            shader.setVec3("objectColor", mesh.Color);
-            shader.setVec3("ambientColor", this.#ambientColor);
-            shader.setInt("NumberLights", this.#lights.length);
-            shader.setMat4("uWorld", mesh.Transformation);
-            shader.setVec3("viewPosition", this.#camera.Position);
-
-            mesh.draw();
+        this.#models.forEach(model => {
+            model.draw(this);
         })
     }
 
