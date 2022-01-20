@@ -23,7 +23,7 @@ uniform vec3 objectColor;
 uniform vec3 ambientColor;
 uniform vec3 viewPosition;
 
-uniform sampler2D texture;
+uniform sampler2D u_texture;
 
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos)
 {
@@ -50,8 +50,7 @@ void main(){
         {
             result += CalcPointLight(pointLights[i], normal, VertexWorldPosition);
         }
-        result *= objectColor;
-        // test UV
-        FragColor = vec4(TexCoord[0], TexCoord[1], 0.0, 1.0);
+        result = result * objectColor * texture(u_texture, TexCoord).rgb;
+        FragColor = vec4(result, 1.0);
 }
 
