@@ -1,12 +1,12 @@
 import {Vertex} from "../../Core/Vertex.js";
-import {Mesh} from "./Mesh.js";
+import {MeshBase} from "./MeshBase.js";
 
-class Grid extends Mesh {
+class GridMesh extends MeshBase {
     #vertices;
     #indices;
     #vertexData;
-    constructor(glContext,resolution,shader,color) {
-        super(glContext,shader, color);
+    constructor(glContext,resolution) {
+        super(glContext);
         this.#vertexData = this.createVertexData(resolution);
         this.#vertices = this.#vertexData.vertices;
         this.#indices = this.#vertexData.indices;
@@ -20,7 +20,8 @@ class Grid extends Mesh {
 
         for (var i = 0, x = 0, z = 0; i < resolution * resolution; i++, x++) {
             let position = [];
-            let normal = [0.0, 1.0, 0.0, 1.0];
+            let uv = [];
+            let normal = [0.0, 1.0, 0.0];
             if (x === resolution) {
                 x = 0;
                 z += 1;
@@ -33,7 +34,10 @@ class Grid extends Mesh {
             position.push(pos_x);
             position.push(pos_y);
             position.push(pos_z);
-            vertices.push(new Vertex(position, normal));
+
+            uv.push(x * step * 0.5);
+            uv.push(z * step * 0.5);
+            vertices.push(new Vertex(position, normal, uv));
 
         }
 
@@ -66,4 +70,4 @@ class Grid extends Mesh {
     }
 }
 
-export {Grid};
+export {GridMesh};

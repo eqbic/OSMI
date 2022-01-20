@@ -1,9 +1,12 @@
-class Cube extends Mesh {
+import {MeshBase} from "./MeshBase.js";
+import {Vertex} from "../../Core/Vertex.js";
+
+class CubeMesh extends MeshBase {
     #vertices;
     #indices;
     #vertexData;
-    constructor(shader, color) {
-        super(shader, color);
+    constructor(gl) {
+        super(gl);
         this.#vertexData = this.createVertexData();
         this.#vertices = this.#vertexData.vertices;
         this.#indices = this.#vertexData.indices;
@@ -50,12 +53,18 @@ class Cube extends Mesh {
         ];
         let vertices = [];
 
-        for (var i = 0; i < positions.length;) {
+        for (let i = 0; i < positions.length;) {
             let position = [];
             let normal = []
+            let texCoord = [];
+
             position.push(positions[i]);
             position.push(positions[i + 1]);
             position.push(positions[i + 2]);
+
+            // TODO: correct UVs for procedural cube
+            texCoord.push(0.0);
+            texCoord.push(0.0);
 
             if(i < 24){
                 normal = [0,0,positions[i + 2]];
@@ -67,12 +76,12 @@ class Cube extends Mesh {
                 normal = [positions[i], 0,0];
             }
 
-            vertices.push(new Vertex(position, normal));
+            vertices.push(new Vertex(position, normal, texCoord));
             i += 3;
         }
 
         let indices = []
-        for( var i = 0; i < 24;){
+        for( let i = 0; i < 24;){
             indices.push(i);
             indices.push(i + 1);
             indices.push(i + 2);
@@ -92,4 +101,4 @@ class Cube extends Mesh {
     }
 }
 
-export {Cube};
+export {CubeMesh};

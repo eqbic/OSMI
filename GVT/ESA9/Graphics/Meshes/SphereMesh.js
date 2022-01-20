@@ -1,13 +1,13 @@
 import {Vertex} from "../../Core/Vertex.js";
-import {Mesh} from "./Mesh.js";
+import {MeshBase} from "./MeshBase.js";
 
 let gl;
-class Sphere extends Mesh {
+class SphereMesh extends MeshBase {
     #vertices;
     #indices;
     #vertexData;
-    constructor(glContext,resolution, shader, color) {
-        super(glContext, shader, color);
+    constructor(glContext,resolution) {
+        super(glContext);
         gl = glContext;
         this.#vertexData = this.createVertexData(resolution);
         this.#vertices = this.#vertexData.vertices;
@@ -38,12 +38,16 @@ class Sphere extends Mesh {
 
                 let position =[];
                 let normal = [];
+                let uv = [];
 
-                var iVertex = i * (m + 1) + j;
+                uv.push(u);
+                uv.push(v);
 
-                var x = r * Math.sin(v) * Math.cos(u);
-                var y = r * Math.sin(v) * Math.sin(u);
-                var z = r * Math.cos(v);
+                let iVertex = i * (m + 1) + j;
+
+                let x = r * Math.sin(v) * Math.cos(u);
+                let y = r * Math.sin(v) * Math.sin(u);
+                let z = r * Math.cos(v);
 
                 // Set vertex positions.
                 position.push(x);
@@ -51,42 +55,31 @@ class Sphere extends Mesh {
                 position.push(z);
 
                 // Calc and set normals.
-                var vertexLength = Math.sqrt(x * x + y * y + z * z);
-                // normals[iVertex * 3] = x / vertexLength;
-                // normals[iVertex * 3 + 1] = y / vertexLength;
-                // normals[iVertex * 3 + 2] = z / vertexLength;
+                let vertexLength = Math.sqrt(x * x + y * y + z * z);
                 normal.push(x / vertexLength);
                 normal.push(y / vertexLength);
                 normal.push(z / vertexLength);
                 normal.push(1.0);
                 
-                
-
                 // Set index.
                 // Line on beam.
                 if (j > 0 && i > 0) {
                     indicesLines[iLines++] = iVertex - 1;
                     indicesLines[iLines++] = iVertex;
-                }
-                // Line on ring.
-                if (j > 0 && i > 0) {
+                    // Line on ring.
                     indicesLines[iLines++] = iVertex - (m + 1);
                     indicesLines[iLines++] = iVertex;
-                }
-
-                // Set index.
-                // Two Triangles.
-                if (j > 0 && i > 0) {
+                    // Set index.
+                    // Two Triangles.
                     indicesTris[iTris++] = iVertex;
                     indicesTris[iTris++] = iVertex - 1;
                     indicesTris[iTris++] = iVertex - (m + 1);
-                    //
                     indicesTris[iTris++] = iVertex - 1;
                     indicesTris[iTris++] = iVertex - (m + 1) - 1;
                     indicesTris[iTris++] = iVertex - (m + 1);
-                }
 
-                vertices.push(new Vertex(position, normal));
+                }
+                vertices.push(new Vertex(position, normal, uv));
             }
         }
         return {
@@ -96,4 +89,4 @@ class Sphere extends Mesh {
     }
 }
 
-export {Sphere};
+export {SphereMesh};

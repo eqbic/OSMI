@@ -1,30 +1,12 @@
-import {Entity} from "../../Core/Entity.js";
 let gl;
-class Mesh extends Entity{
+class MeshBase {
     #vao;
     #vbo;
     #indexBuffer;
     #indices;
-    #color;
-    #shader;
 
-    constructor(glContext,shader, color){
-        super();
+    constructor(glContext){
         gl = glContext;
-        this.#shader = shader;
-        this.#color = color;
-    }
-
-    get Color(){
-        return this.#color;
-    }
-
-    get Shader(){
-        return this.#shader;
-    }
-
-    set Shader(shader){
-        this.#shader = shader;
     }
 
     setupMesh(vertices, indices){
@@ -91,4 +73,4 @@ class Mesh extends Entity{
 
 }
 
-export {Mesh};
+export {MeshBase};

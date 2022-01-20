@@ -1,13 +1,13 @@
 import {Vertex} from "../../Core/Vertex.js";
-import {Mesh} from "./Mesh.js";
+import {MeshBase} from "./MeshBase.js";
 
-class MeshLoader extends Mesh{
+class ObjMesh extends MeshBase{
     #objSource
     #vertices;
     #indices;
     #vertexData;
-    constructor(glContext, path, shader, color) {
-        super(glContext, shader, color);
+    constructor(glContext, path) {
+        super(glContext);
         this.#objSource = this.loadOBJ(path);
         this.#vertexData = this.createVertexData(this.#objSource);
         this.#vertices = this.#vertexData.vertices;
@@ -89,4 +89,4 @@ class MeshLoader extends Mesh{
 
 }
 
-export {MeshLoader};
+export {ObjMesh};

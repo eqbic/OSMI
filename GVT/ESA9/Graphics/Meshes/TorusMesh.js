@@ -1,14 +1,12 @@
 import {Vertex} from "../../Core/Vertex.js";
-import {Mesh} from "./Mesh.js";
+import {MeshBase} from "./MeshBase.js";
 
-let gl;
-class Torus extends Mesh {
+class TorusMesh extends MeshBase {
     #vertices;
     #indices;
     #vertexData;
-    constructor(glContext, resolution_n, resolution_m, shader, color) {
-        super(glContext, shader, color);
-        gl = glContext;
+    constructor(glContext, resolution_n, resolution_m) {
+        super(glContext);
         this.#vertexData = this.createVertexData(resolution_n, resolution_m);
         this.#vertices = this.#vertexData.vertices;
         this.#indices = this.#vertexData.indices;
@@ -16,8 +14,8 @@ class Torus extends Mesh {
     }
 
     createVertexData(resolution_n, resolution_m) {
-        var n = resolution_n;
-        var m = resolution_m;
+        const n = resolution_n;
+        const m = resolution_m;
 
         // Positions.
         this.positions = new Float32Array(3 * (n + 1) * (m + 1));
@@ -48,6 +46,7 @@ class Torus extends Mesh {
                 var iVertex = i * (m + 1) + j;
                 let position = [];
                 let normal = [];
+                let uv = [];
 
                 var x = (R + r * Math.cos(u)) * Math.cos(v);
                 var y = (R + r * Math.cos(u)) * Math.sin(v);
@@ -74,6 +73,9 @@ class Torus extends Mesh {
                 normals[iVertex * 3] = nx;
                 normals[iVertex * 3 + 1] = ny;
                 normals[iVertex * 3 + 2] = nz;
+
+                uv.push(u);
+                uv.push(v);
 
                 // if(i>14){
                 // continue;
@@ -102,7 +104,7 @@ class Torus extends Mesh {
                     indicesTris[iTris++] = iVertex - (m + 1) - 1;
                     indicesTris[iTris++] = iVertex - (m + 1);
                 }
-                vertices.push(new Vertex(position, normal));
+                vertices.push(new Vertex(position, normal, uv));
             }
         }
         return {
@@ -112,4 +114,4 @@ class Torus extends Mesh {
     }
 }
 
-export {Torus};
+export {TorusMesh};
