@@ -14,7 +14,22 @@ class ModelBase extends Entity{
         const shader = this.#material.Shader;
         const camera = scene.Camera;
         shader.use();
-        gl.bindTexture(gl.TEXTURE_2D, this.#material.ColorTexture);
+        // gl.bindTexture(gl.TEXTURE_2D, this.#material.ColorMap);
+
+        const colorLocation = shader.getUniformLocation("u_ColorMap");
+        const metalLocation = shader.getUniformLocation("u_MetalMap");
+        const roughnessLocation = shader.getUniformLocation("u_RoughnessMap");
+
+        gl.uniform1i(colorLocation, 0);
+        gl.uniform1i(metalLocation, 1);
+        gl.uniform1i(roughnessLocation, 2);
+
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, this.#material.ColorMap);
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, this.#material.MetalMap);
+        gl.activeTexture(gl.TEXTURE2);
+        gl.bindTexture(gl.TEXTURE_2D, this.#material.RoughnessMap);
 
         scene.Lights.forEach((light, index) => {
             shader.setInt(`lights[${index}].type`, light.Type);

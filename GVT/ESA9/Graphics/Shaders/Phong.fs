@@ -3,7 +3,7 @@ precision highp float;
 
 
 in vec3 VertexWorldPosition;
-in vec4 Normal;
+in vec3 Normal;
 in vec2 TexCoord;
 
 out vec4 FragColor;
@@ -25,19 +25,21 @@ uniform vec3 ambientColor;
 uniform vec3 viewPosition;
 
 uniform sampler2D u_texture;
-
+float gamma = 2.2;
 vec3 CalcLight(Light light, vec3 normal, vec3 fragPos, vec3 lightDir)
 {
     float specularStrength = light.strength;
     vec3 viewDir = normalize(viewPosition - fragPos);
     vec3 reflectDir = reflect(-lightDir, normal);
-    float diff = dot(normal, lightDir);
+
+    float diff = max(dot(normal, lightDir), 0.0);
     vec3 diffuse  = light.color  * diff * light.strength;
 
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 256.0);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 64.0);
     vec3 specular = specularStrength * spec * light.color;
-    vec3 result = diffuse + specular;
 
+    vec3 result = diffuse + specular;
+    result = pow(result, vec3(1.0/gamma));
     return result;
 }
 
@@ -52,7 +54,8 @@ vec3 GetDirectionalLightDir(Light light){
 void main(){
 
         vec3 result = ambientColor;
-        vec3 normal = normalize(Normal.xyz);
+        vec3 normal = normalize(Normal).xyz;
+
         vec3 lightDir = vec3(0);
         Light light;
         for(int i = 0; i < numberLights; i++)
@@ -68,6 +71,8 @@ void main(){
         }
 
         result = result * objectColor * texture(u_texture, TexCoord).rgb;
+
+
         FragColor = vec4(result, 1.0);
 }
 

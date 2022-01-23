@@ -10,7 +10,7 @@ uniform mat4 uWorld;
 
 
 out vec3 VertexWorldPosition;
-out vec4 Normal;
+out vec3 Normal;
 out vec2 TexCoord;
 
 void main(){
@@ -18,6 +18,7 @@ void main(){
     gl_Position = uProjection * uView * uWorld * vertexPosition;
 
     VertexWorldPosition = vec3(uWorld * vertexPosition);
-    Normal = uWorld * vec4(aNormal, 0.0);
+    Normal = normalize(uWorld * vec4(aNormal, 0.0)).xyz;
+
     TexCoord = aTexCoord;
 }

@@ -47,7 +47,7 @@ class ObjMesh extends MeshBase{
                 let texCoord =
                     [
                         parseFloat(p[1]),
-                        parseFloat(p[2]),
+                        parseFloat(p[2]) * -1.0,
                     ];
                 texCoords.push(texCoord);
             }

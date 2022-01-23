@@ -5,10 +5,10 @@ class Shader {
     #fragmentShaderSource;
     #program;
 
-    constructor(glContext, vertexPath, fragmentPath) {
+    constructor(glContext, shaderType) {
         gl = glContext;
-        this.#vertexShaderSource = this.getShaderSource(vertexPath);
-        this.#fragmentShaderSource = this.getShaderSource(fragmentPath);
+        this.#vertexShaderSource = this.getShaderSource(shaderType[0]);
+        this.#fragmentShaderSource = this.getShaderSource(shaderType[1]);
         this.#program = this.initShaderProgram(this.#vertexShaderSource, this.#fragmentShaderSource);
     }
 
@@ -39,6 +39,10 @@ class Shader {
     setMat4(uniformName, value){
         const uniformID = gl.getUniformLocation(this.#program, uniformName);
         gl.uniformMatrix4fv(uniformID, false, value);
+    }
+
+    getUniformLocation(uniformName){
+        return gl.getUniformLocation(this.#program, uniformName);
     }
 
 
