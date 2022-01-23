@@ -1,6 +1,6 @@
 import {Material} from "./Material.js";
 import {Shader} from "../../Core/Shader.js";
-import {Shaders} from "../../Utils/Shaders.js";
+import {ShaderType} from "../../Utils/ShaderType.js";
 
 let gl;
 class PBRMaterial extends Material{
@@ -10,7 +10,7 @@ class PBRMaterial extends Material{
     #normalMap;
 
     constructor(glContext, color, colorMapPath, metalMapPath, roughnessMapPath, normalMapPath) {
-        super(glContext, new Shader(glContext, Shaders.PBR), color);
+        super(glContext, new Shader(glContext, ShaderType.PBR), color);
         gl = glContext;
 
         this.#colorMap = gl.createTexture();

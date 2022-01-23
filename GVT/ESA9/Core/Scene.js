@@ -42,10 +42,10 @@ class Scene{
         this.#lights.push(light);
     }
 
-    draw(){
+    draw(time){
         this.#clear();
         this.#models.forEach(model => {
-            model.draw(this);
+            model.draw(this, time);
         })
     }
 

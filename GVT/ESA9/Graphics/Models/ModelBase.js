@@ -10,7 +10,7 @@ class ModelBase extends Entity{
         this.#material = material;
     }
 
-    draw(scene){
+    draw(scene, time){
         const shader = this.#material.Shader;
         const camera = scene.Camera;
         shader.use();
@@ -50,6 +50,7 @@ class ModelBase extends Entity{
         shader.setInt("numberLights", scene.Lights.length);
         shader.setMat4("uWorld", this.Transformation);
         shader.setVec3("viewPosition", camera.Position);
+        shader.setFloat("u_time", time);
 
         this.#mesh.draw();
     }

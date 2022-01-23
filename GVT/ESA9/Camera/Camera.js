@@ -31,7 +31,7 @@ class Camera {
     }
 
     reset(){
-        mat4.targetTo(this.#viewMatrix, [0,2,5], this.#target, [0.0, 1.0, 0.0]);
+        mat4.targetTo(this.#viewMatrix, [3,3,3], this.#target, [0.0, 1.0, 0.0]);
     }
 
     get Projection(){
