@@ -6,10 +6,13 @@ import {FileModel} from "./Graphics/Models/FileModel.js";
 import {PBRMaterial} from "./Graphics/Materials/PBRMaterial.js";
 import {PhongMaterial} from "./Graphics/Materials/PhongMaterial.js";
 import {DirectionalLight} from "./Graphics/Lights/DirectionalLight.js";
+import {Animator} from "./Animation/Animator.js";
+import {Grid} from "./Graphics/Models/Grid.js";
 
 // Shortcuts to Assets
 const modelPath = "Resources/Models/";
 const cannonTex = "Resources/Textures/Cannon/";
+const floorTex = "Resources/Textures/Floor/";
 
 const container = document.getElementById('renderer');
 const canvas = new Canvas("glCanvas", container);
@@ -19,22 +22,28 @@ const gl = canvas.GL;
 const scene = new Scene(gl,Colors.DarkBlue);
 
 // Create Materials
-const pbrTest = new PBRMaterial(gl, Colors.White, cannonTex + "Cannon_Albedo.png", cannonTex + "Cannon_Metalness.png", cannonTex + "Cannon_Roughness.png");
+const cannonMat = new PBRMaterial(gl, Colors.White, cannonTex + "Cannon_Albedo.png", cannonTex + "Cannon_Metalness.png", cannonTex + "Cannon_Roughness.png", cannonTex + "Cannon_Normal.png");
+const floorMat = new PBRMaterial(gl, Colors.White, floorTex + "floor_albedo.jpg", floorTex + "floor_metal.jpg", floorTex + "floor_roughness.jpg", floorTex + "floor_normal.jpg");
 const uv_pattern = new PhongMaterial(gl, Colors.White, "Resources/Textures/uv_test.jpg");
 
-const cannon = new FileModel(gl, modelPath + 'cannon.obj', pbrTest);
+const floor = new Grid(gl, 8, floorMat);
+scene.addModel(floor);
+floor.uniformscale(2);
+
+const cannon = new FileModel(gl, modelPath + 'cannon.obj', cannonMat);
 scene.addModel(cannon);
 
 // Create Lights and add to the scene
-
-const light = new DirectionalLight(Colors.SunLight, 5.0);
+const light = new DirectionalLight(Colors.SunLight, 1.0);
 scene.addLight(light);
 light.Position = [-2, 2, -2];
 
 
-// const pointLight = new PointLight(Colors.Red, 1.0);
-// scene.addLight(pointLight);
-// pointLight.Position = [0.0, 1.0, 0.0];
+const pointLight = new PointLight(Colors.Red, 3.0);
+scene.addLight(pointLight);
+pointLight.Position = [0.5, 2, 0.0];
+
+const animator = new Animator();
 
 function processInput(e) {
     switch (e.code) {
@@ -68,7 +77,8 @@ window.addEventListener('keydown', processInput);
 
 function draw() {
 
-    // monkey.rotate([0,0,1]);
+    pointLight.Position = animator.rotateAroundY(pointLight.Position, 1, [0,0,0]);
+
     scene.draw();
     window.requestAnimationFrame(draw);
 }

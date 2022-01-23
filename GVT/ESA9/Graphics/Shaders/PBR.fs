@@ -10,6 +10,7 @@ uniform vec3 viewPosition;
 uniform sampler2D u_ColorMap;
 uniform sampler2D u_MetalMap;
 uniform sampler2D u_RoughnessMap;
+uniform sampler2D u_NormalMap;
 
 uniform vec3 objectColor;
 uniform vec3 ambientColor;
@@ -19,6 +20,7 @@ vec3 albedo = vec3(1.0, 0.0, 0.0);
 float metallic = 0.0;
 float roughness = 1.0;
 float ao = 1.0;
+vec3 texNormal = vec3(0);
 
 const float PI = 3.14159265359;
 
@@ -45,8 +47,9 @@ vec3 GetDirectionalLightDir(Light light);
 void main()
 {
     albedo = texture(u_ColorMap, TexCoord).rgb * objectColor;
-    metallic = texture(u_MetalMap, TexCoord).r;
+    metallic = texture(u_MetalMap, TexCoord).b;
     roughness = texture(u_RoughnessMap, TexCoord).r;
+    texNormal = texture(u_NormalMap, TexCoord).rgb;
     vec3 N = normalize(Normal);
     vec3 V = normalize(viewPosition - VertexWorldPosition);
 
@@ -98,6 +101,7 @@ void main()
 
     color = color / (color + vec3(1.0));
     color = pow(color, vec3(1.0/2.2));
+
 
     FragColor = vec4(color, 1.0);
 }
