@@ -8,27 +8,27 @@ in vec2 TexCoord;
 
 out vec4 FragColor;
 
-struct PointLight
+struct Light
 {
+    int type;
     vec3 position;
     vec3 color;
     float strength;
 };
+
 #define MAX_NR_LIGHTS 20
 
-uniform int NumberLights;
-uniform PointLight pointLights[MAX_NR_LIGHTS];
-
+uniform int numberLights;
+uniform Light lights[MAX_NR_LIGHTS];
 uniform vec3 objectColor;
 uniform vec3 ambientColor;
 uniform vec3 viewPosition;
 
 uniform sampler2D u_texture;
 
-vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos)
+vec3 CalcLight(Light light, vec3 normal, vec3 fragPos, vec3 lightDir)
 {
     float specularStrength = light.strength;
-    vec3 lightDir = normalize(light.position - fragPos);
     vec3 viewDir = normalize(viewPosition - fragPos);
     vec3 reflectDir = reflect(-lightDir, normal);
     float diff = dot(normal, lightDir);
@@ -41,15 +41,33 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos)
     return result;
 }
 
+vec3 GetPointLightDir(Light light, vec3 fragPos){
+    return normalize(light.position - fragPos);
+}
+
+vec3 GetDirectionalLightDir(Light light){
+    return normalize(light.position);
+}
+
 void main(){
 
         vec3 result = ambientColor;
         vec3 normal = normalize(Normal.xyz);
-
-        for(int i = 0; i < NumberLights; i++)
+        vec3 lightDir = vec3(0);
+        Light light;
+        for(int i = 0; i < numberLights; i++)
         {
-            result += CalcPointLight(pointLights[i], normal, VertexWorldPosition);
+            light = lights[i];
+            if(light.type == 0){
+                lightDir = GetPointLightDir(light, VertexWorldPosition);
+            }else if(light.type == 1){
+                lightDir = GetDirectionalLightDir(light);
+            }
+
+            result += CalcLight(light, normal, VertexWorldPosition, lightDir);
         }
+
         result = result * objectColor * texture(u_texture, TexCoord).rgb;
         FragColor = vec4(result, 1.0);
 }
+

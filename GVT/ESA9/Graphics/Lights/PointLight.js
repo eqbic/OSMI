@@ -1,8 +1,8 @@
-import {Light} from "./Light.js";
+import {Light, LightType} from "./Light.js";
 
 class PointLight extends Light{
     constructor(color, strength) {
-        super(color, strength);
+        super(LightType.Point, color, strength);
     }
 }
 export {PointLight};

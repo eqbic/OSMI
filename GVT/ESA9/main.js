@@ -1,51 +1,50 @@
 import { Canvas } from "./Core/Canvas.js";
 import { Shader } from "./Core/Shader.js";
 import { Scene } from "./Core/Scene.js";
-import { Animator } from "./Animation/Animator.js";
-import { GridMesh } from "./Graphics/Meshes/GridMesh.js";
-import { ObjMesh } from "./Graphics/Meshes/ObjMesh.js";
 import { PointLight } from "./Graphics/Lights/PointLight.js";
-import { SphereMesh } from "./Graphics/Meshes/SphereMesh.js";
-import { TorusMesh } from "./Graphics/Meshes/TorusMesh.js";
 import {Colors} from "./Utils/Colors.js";
-import {ModelBase} from "./Graphics/Models/ModelBase.js";
 import {Material} from "./Graphics/Materials/Material.js";
-import {Cube} from "./Graphics/Models/Cube.js";
 import {FileModel} from "./Graphics/Models/FileModel.js";
-import {Grid} from "./Graphics/Models/Grid.js";
-import {Torus} from "./Graphics/Models/Torus.js";
-import {Sphere} from "./Graphics/Models/Sphere.js";
+import {DirectionalLight} from "./Graphics/Lights/DirectionalLight.js";
 
-const container = document.getElementById('renderer');
-let canvas = new Canvas("glCanvas", container);
-let gl = canvas.GL;
-
-
+// Shortcuts to Assets
 const shaderPath = "Graphics/Shaders/";
 const modelPath = "Resources/Models/";
 
-const toonShader = new Shader(gl, shaderPath + "toon.vs", shaderPath + "toon.fs");
-const phongPoint = new Shader(gl, shaderPath + "Phong.vs", shaderPath + "PhongPoint.fs");
-const phongDirectional = new Shader(gl, shaderPath + "Phong.vs", shaderPath + "PhongDirectional.fs");
+const container = document.getElementById('renderer');
+const canvas = new Canvas("glCanvas", container);
+const gl = canvas.GL;
 
-const scene = new Scene(gl,[0.1, 0.2, 0.3]);
-const animator = new Animator();
+// Create Scene.
+const scene = new Scene(gl,Colors.SkyBlue);
 
-const wood = new Material(gl, phongPoint, Colors.White, "Resources/Textures/wood.jpg");
-const uv_pattern = new Material(gl, phongPoint, Colors.White, "Resources/Textures/uv_grid.jpg");
+// Shaders
+const phong = new Shader(gl, shaderPath + "Phong.vs", shaderPath + "Phong.fs");
 
+// Materials
+const wood = new Material(gl, phong, Colors.White, "Resources/Textures/wood.jpg");
+const uv_pattern = new Material(gl, phong, Colors.White, "Resources/Textures/uv_grid.jpg");
+
+// Create Models and add to the scene
 const monkey = new FileModel(gl, modelPath + 'monkey_smooth.obj', uv_pattern);
 scene.addModel(monkey);
 monkey.Position = [0, 1, 0];
 monkey.uniformscale(0.5);
 
-const floor = new Grid(gl, 16, wood);
+const floor = new FileModel(gl, modelPath + 'floor.obj', wood);
 scene.addModel(floor);
-floor.uniformscale(5);
 
-const light = new PointLight(Colors.White, 0.5);
-scene.addLight(light);
-light.Position = [0, 2, 1];
+const walls = new FileModel(gl, modelPath + 'walls.obj', wood);
+scene.addModel(walls);
+
+// Create Lights and add to the scene
+const sun = new DirectionalLight(Colors.SunLight, 1.0);
+scene.addLight(sun);
+sun.Position = [3, 1, 0];
+
+const pointLight = new PointLight(Colors.Red, 1.0);
+scene.addLight(pointLight);
+pointLight.Position = [-0.9, 1.0, -0.9];
 
 function processInput(e) {
     switch (e.code) {
@@ -78,14 +77,6 @@ function processInput(e) {
 window.addEventListener('keydown', processInput);
 
 function draw() {
-
-    // scene.Lights.forEach(light => {
-    //     light.Position = animator.rotateAroundY(light.Position, 0.5, [0, 0, 0]);
-    // });
-    //
-    // torus1.rotate([0.5, 0, 0]);
-    // torus2.rotate([0, 0.5, 0]);
-    // torus3.rotate([0, 0.5, 0.5]);
 
     monkey.rotate([0,0,1]);
     scene.draw();
