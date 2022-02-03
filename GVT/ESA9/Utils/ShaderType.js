@@ -1,11 +1,10 @@
-const shaderPath = "../Graphics/Shaders/";
 class ShaderType {
 
     constructor() {}
 
-    static Phong = [shaderPath + "Phong.vs", shaderPath + "Phong.fs"];
-    static PBR = [shaderPath + "PBR.vs", shaderPath + "PBR.fs"];
-    static Noise = [shaderPath + "Noise.vs", shaderPath + "Noise.fs"];
+    static Phong = ["Graphics/Shaders/Phong.vs", "Graphics/Shaders/Phong.fs"];
+    static PBR = ["Graphics/Shaders/PBR.vs", "Graphics/Shaders/PBR.fs"];
+    static Noise = ["Graphics/Shaders/Noise.vs", "Graphics/Shaders/Noise.fs"];
 }
 
 export {ShaderType};
