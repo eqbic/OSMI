@@ -1,0 +1,30 @@
+body{
+    margin: 30px;
+    color: #ffffff;
+    background-color: #262b30;
+}
+
+#renderer{
+    min-height: 600px;
+}
+
+#all{
+    border: 1px solid blue;
+}
+
+#main-container{
+    height: 100%;
+}
+
+h1{
+    font-size: 36pt;
+    font-weight: bold;
+}
+
+h2{
+    font-size: 18pt;
+}
+
+h3{
+    font-size: 14pt;
+}
