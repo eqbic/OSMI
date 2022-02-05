@@ -9,6 +9,8 @@ import {DirectionalLight} from "./Graphics/Lights/DirectionalLight.js";
 import {Animator} from "./Animation/Animator.js";
 import {Grid} from "./Graphics/Models/Grid.js";
 import {NoiseMaterial} from "./Graphics/Materials/NoiseMaterial.js";
+import {ConstantMaterial} from "./Graphics/Materials/ConstantMaterial.js";
+import {Sphere} from "./Graphics/Models/Sphere.js";
 
 // Shortcuts to Assets
 const modelPath = "Resources/Models/";
@@ -27,36 +29,11 @@ const cannonMat = new PBRMaterial(gl, Colors.White, cannonTex + "Cannon_Albedo.p
 const floorMat = new PBRMaterial(gl, Colors.White, floorTex + "floor_albedo.jpg", floorTex + "floor_metal.jpg", floorTex + "floor_roughness.jpg", floorTex + "floor_normal.jpg");
 const uv_pattern = new PhongMaterial(gl, Colors.White, "Resources/Textures/uv_test.jpg");
 const noiseMat = new NoiseMaterial(gl, Colors.White);
+const redMat = new ConstantMaterial(gl, Colors.Red);
 
 
-// Create Models
-const floor = new Grid(gl, 8, floorMat);
-scene.addModel(floor);
-floor.uniformscale(2);
-
-const cannon = new FileModel(gl, modelPath + 'cannon.obj', cannonMat);
-scene.addModel(cannon);
-
-const torus = new FileModel(gl, modelPath + 'torus.obj', noiseMat);
-scene.addModel(torus);
-torus.rotate([90, 0, 0]);
-torus.Position = [0,0.8,1.3];
-torus.uniformscale(0.3);
-
-
-// Create Lights and add to the scene
-const light = new DirectionalLight(Colors.SunLight, 1.0);
-scene.addLight(light);
-light.Position = [-2, 5, -2];
-
-const skylight = new DirectionalLight(Colors.SkyBlue, 0.8);
-scene.addLight(skylight);
-skylight.Position = [2, -5, 2];
-
-
-const pointLight = new PointLight(Colors.Red, 1.0);
-scene.addLight(pointLight);
-pointLight.Position = [0.5, 2, 0.0];
+const sphere = new Sphere(gl, 32, redMat);
+scene.addModel(sphere);
 
 
 function processInput(e) {
