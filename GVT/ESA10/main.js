@@ -1,20 +1,12 @@
 import { Canvas } from "./Core/Canvas.js";
 import { Scene } from "./Core/Scene.js";
-import { PointLight } from "./Graphics/Lights/PointLight.js";
 import {Colors} from "./Utils/Colors.js";
-import {FileModel} from "./Graphics/Models/FileModel.js";
-import {PBRMaterial} from "./Graphics/Materials/PBRMaterial.js";
-import {PhongMaterial} from "./Graphics/Materials/PhongMaterial.js";
-import {DirectionalLight} from "./Graphics/Lights/DirectionalLight.js";
-import {Animator} from "./Animation/Animator.js";
-import {Grid} from "./Graphics/Models/Grid.js";
-import {NoiseMaterial} from "./Graphics/Materials/NoiseMaterial.js";
 import {ConstantMaterial} from "./Graphics/Materials/ConstantMaterial.js";
 import {Sphere} from "./Graphics/Models/Sphere.js";
 import {CsvReader} from "./Utils/CsvReader.js";
 
 // init tsne
-var opt = {
+const opt = {
     epsilon: 10,
     perplexity: 15,
     dim: 3
@@ -30,10 +22,22 @@ csvData.forEach(data => {
     tsneData.push(data.data);
 })
 tsne.initDataRaw(tsneData);
-const result = tsne.getSolution();
 
 let step = 0;
+for(let i = 0; i < 100; i++){
+    tsne.step();
+    step++;
+}
+currentStep.innerText = step;
+const result = tsne.getSolution();
+
+let manual = false;
 function CalcStep(){
+    if(!manual){
+        manual = true;
+        step = 0;
+        tsne.initDataRaw(tsneData);
+    }
     tsne.step();
     step += 1;
     currentStep.innerText = step;
@@ -43,21 +47,19 @@ function CalcStep(){
     }
 }
 
-
-
 const container = document.getElementById('renderer');
 const canvas = new Canvas("glCanvas", container);
 const gl = canvas.GL;
 
 // Create Scene.
-const scene = new Scene(gl,Colors.DarkBlue);
+const scene = new Scene(gl,Colors.DarkPurple);
 
 // Create Materials
-const redMat = new ConstantMaterial(gl, Colors.Red);
-const blueMat = new ConstantMaterial(gl, Colors.Blue);
-const greenMat = new ConstantMaterial(gl, Colors.Green);
+const orangeMat = new ConstantMaterial(gl, Colors.LightOrange);
+const purpleMat = new ConstantMaterial(gl, Colors.LightPurple);
+const greenMat = new ConstantMaterial(gl, Colors.LightGreen);
 
-const seedMats = [redMat, blueMat, greenMat];
+const seedMats = [orangeMat, purpleMat, greenMat];
 
 result.forEach((position, index) => {
     const category = csvData[index].category;
@@ -101,9 +103,12 @@ function processInput(e) {
 window.addEventListener('keydown', processInput);
 let time = 0.0;
 function draw() {
+
     scene.draw(time);
     time += 0.01;
+
     window.requestAnimationFrame(draw);
+
 }
 
 window.requestAnimationFrame(draw);

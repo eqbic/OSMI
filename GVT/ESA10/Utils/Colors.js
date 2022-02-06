@@ -13,6 +13,7 @@ class Colors{
     static LightOrange = [0.968, 0.733, 0.505];
     static LightPurple = [0.564, 0.407, 0.968];
     static LightGreen = [0.309, 0.968, 0.376];
+    static DarkPurple = [0.113, 0.062, 0.219];
 }
 
 export {Colors};
