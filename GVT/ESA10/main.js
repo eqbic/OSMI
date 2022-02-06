@@ -8,7 +8,7 @@ import {CsvReader} from "./Utils/CsvReader.js";
 // init tsne
 const opt = {
     epsilon: 10,
-    perplexity: 15,
+    perplexity: 25,
     dim: 3
 };
 
@@ -24,7 +24,7 @@ csvData.forEach(data => {
 tsne.initDataRaw(tsneData);
 
 let step = 0;
-for(let i = 0; i < 100; i++){
+for(let i = 0; i < 110; i++){
     tsne.step();
     step++;
 }
