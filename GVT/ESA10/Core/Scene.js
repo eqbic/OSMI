@@ -10,7 +10,7 @@ class Scene{
 
         gl = glContext;
         const resolution = [gl.canvas.clientWidth, gl.canvas.clientHeight];
-        this.#camera = new Camera(resolution, 45, 0.1, 100, [0, 10, 10], [0, 0, 0]);
+        this.#camera = new Camera(resolution, 45, 0.1, 100, [0, 0, 10], [0, 0, 0]);
         this.#models = [];
         this.#lights = [];
         this.#ambientColor = ambientColor;

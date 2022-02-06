@@ -38,6 +38,10 @@ class Entity{
         this.translate(translation);
     }
 
+    set Transformation(mat){
+        this._Transformation = mat;
+    }
+
     get Transformation(){
         return this._Transformation;
     }

@@ -4,6 +4,8 @@ import {Colors} from "./Utils/Colors.js";
 import {ConstantMaterial} from "./Graphics/Materials/ConstantMaterial.js";
 import {Sphere} from "./Graphics/Models/Sphere.js";
 import {CsvReader} from "./Utils/CsvReader.js";
+import {PhongMaterial} from "./Graphics/Materials/PhongMaterial.js";
+import {DirectionalLight} from "./Graphics/Lights/DirectionalLight.js";
 
 // init tsne
 const opt = {
@@ -59,6 +61,7 @@ const orangeMat = new ConstantMaterial(gl, Colors.LightOrange);
 const purpleMat = new ConstantMaterial(gl, Colors.LightPurple);
 const greenMat = new ConstantMaterial(gl, Colors.LightGreen);
 
+
 const seedMats = [orangeMat, purpleMat, greenMat];
 
 result.forEach((position, index) => {
@@ -69,36 +72,45 @@ result.forEach((position, index) => {
     point.uniformscale(0.1);
 });
 
+const rotationSpeed = 3.0;
+const translationSpeed = 0.5;
 function processInput(e) {
-    switch (e.code) {
-        case "KeyA":
-            scene.Camera.moveAlongCircle(-5);
-            break;
-        case "KeyD":
-            scene.Camera.moveAlongCircle(5);
-            break;
-        case "KeyS":
-            scene.Camera.move([0, -0.5, 0]);
-            break;
-        case "KeyW":
-            scene.Camera.move([0, 0.5, 0]);
-            break;
-        case "KeyI":
-            scene.Camera.zoom(0.5);
-            break;
-        case "KeyO":
-            scene.Camera.zoom(-0.5);
-            break;
-        case "KeyR":
-            scene.Camera.reset();
-            break;
-        case "KeyT":
-            CalcStep();
-            break;
-        default:
-            break;
+    if (e.code === "KeyH") {
+        scene.Camera.rotate([0, rotationSpeed, 0]);
     }
-
+    if (e.code === "KeyK") {
+        scene.Camera.rotate([0, -rotationSpeed, 0]);
+    }
+    if (e.code === "KeyU") {
+        scene.Camera.rotate([rotationSpeed, 0, 0]);
+    }
+    if (e.code === "KeyJ") {
+        scene.Camera.rotate([-rotationSpeed, 0, 0]);
+    }
+    if (e.code === "KeyW") {
+        scene.Camera.translate([0, 0, -translationSpeed]);
+    }
+    if (e.code === "KeyS") {
+        scene.Camera.translate([0, 0, translationSpeed]);
+    }
+    if (e.code === "KeyA") {
+        scene.Camera.translate([-translationSpeed, 0, 0]);
+    }
+    if (e.code === "KeyD") {
+        scene.Camera.translate([translationSpeed, 0, 0]);
+    }
+    if (e.code === "KeyQ") {
+        scene.Camera.translate([0, translationSpeed, 0]);
+    }
+    if (e.code === "KeyE") {
+        scene.Camera.translate([0, -translationSpeed, 0]);
+    }
+    if (e.code === "KeyR") {
+        scene.Camera.reset();
+    }
+    if (e.code === "KeyT") {
+        CalcStep();
+    }
 }
 window.addEventListener('keydown', processInput);
 let time = 0.0;
