@@ -39,10 +39,34 @@
 
                             <dt class="col-sm-3">R:</dt>
                             <dd class="col-sm-9">Reset camera.</dd>
+
+                            <dt class="col-sm-3">T:</dt>
+                            <dd class="col-sm-9">Calculate next t-SNE step. <br>(Hold for faster iteration)</dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <div class="card text-white bg-dark mb-3 mt-3">
+                    <h2 class="card-header">t-SNE Settings</h2>
+                    <div class="card-body">
+                        <dl class="row">
+                            <dt class="col-sm-4">Epsilon:</dt>
+                            <dd class="col-sm-8">10</dd>
+
+                            <dt class="col-sm-4">Perplexity:</dt>
+                            <dd class="col-sm-8">30</dd>
+
+                            <dt class="col-sm-4">Dim:</dt>
+                            <dd class="col-sm-8">3</dd>
+
+                            <dt class="col-sm-4" id="step">Step:</dt>
+                            <dd class="col-sm-8" id="currentStep">0</dd>
                         </dl>
                     </div>
                 </div>
             </div>
+
+
 
             <div class="col-8">
                 <div class="card text-white bg-dark mt-3" >

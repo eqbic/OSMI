@@ -11,11 +11,39 @@ import {Grid} from "./Graphics/Models/Grid.js";
 import {NoiseMaterial} from "./Graphics/Materials/NoiseMaterial.js";
 import {ConstantMaterial} from "./Graphics/Materials/ConstantMaterial.js";
 import {Sphere} from "./Graphics/Models/Sphere.js";
+import {CsvReader} from "./Utils/CsvReader.js";
 
-// Shortcuts to Assets
-const modelPath = "Resources/Models/";
-const cannonTex = "Resources/Textures/Cannon/";
-const floorTex = "Resources/Textures/Floor/";
+// init tsne
+var opt = {
+    epsilon: 10,
+    perplexity: 15,
+    dim: 3
+};
+
+let currentStep = document.getElementById("currentStep");
+
+
+const tsne = new tsnejs.tSNE(opt);
+const csvData = CsvReader.Read("Resources/Data/seeds.csv");
+const tsneData = [];
+csvData.forEach(data => {
+    tsneData.push(data.data);
+})
+tsne.initDataRaw(tsneData);
+const result = tsne.getSolution();
+
+let step = 0;
+function CalcStep(){
+    tsne.step();
+    step += 1;
+    currentStep.innerText = step;
+    const newPositions = tsne.getSolution();
+    for(let i = 0; i < scene.Models.length; i++){
+        scene.Models[i].Position = newPositions[i];
+    }
+}
+
+
 
 const container = document.getElementById('renderer');
 const canvas = new Canvas("glCanvas", container);
@@ -25,16 +53,19 @@ const gl = canvas.GL;
 const scene = new Scene(gl,Colors.DarkBlue);
 
 // Create Materials
-const cannonMat = new PBRMaterial(gl, Colors.White, cannonTex + "Cannon_Albedo.png", cannonTex + "Cannon_Metalness.png", cannonTex + "Cannon_Roughness.png", cannonTex + "Cannon_Normal.png");
-const floorMat = new PBRMaterial(gl, Colors.White, floorTex + "floor_albedo.jpg", floorTex + "floor_metal.jpg", floorTex + "floor_roughness.jpg", floorTex + "floor_normal.jpg");
-const uv_pattern = new PhongMaterial(gl, Colors.White, "Resources/Textures/uv_test.jpg");
-const noiseMat = new NoiseMaterial(gl, Colors.White);
 const redMat = new ConstantMaterial(gl, Colors.Red);
+const blueMat = new ConstantMaterial(gl, Colors.Blue);
+const greenMat = new ConstantMaterial(gl, Colors.Green);
 
+const seedMats = [redMat, blueMat, greenMat];
 
-const sphere = new Sphere(gl, 32, redMat);
-scene.addModel(sphere);
-
+result.forEach((position, index) => {
+    const category = csvData[index].category;
+    const point = new Sphere(gl, 16, seedMats[category - 1]);
+    scene.addModel(point);
+    point.Position = position;
+    point.uniformscale(0.1);
+});
 
 function processInput(e) {
     switch (e.code) {
@@ -58,6 +89,9 @@ function processInput(e) {
             break;
         case "KeyR":
             scene.Camera.reset();
+            break;
+        case "KeyT":
+            CalcStep();
             break;
         default:
             break;
