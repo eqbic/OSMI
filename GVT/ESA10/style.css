@@ -28,3 +28,14 @@ h2{
 h3{
     font-size: 14pt;
 }
+
+
+#currentStep{
+    font-weight: bold;
+    font-size: 18pt;
+}
+
+#step{
+    font-weight: bold;
+    font-size: 18pt;
+}
