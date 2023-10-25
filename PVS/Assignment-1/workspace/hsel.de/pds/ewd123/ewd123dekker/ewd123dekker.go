@@ -38,12 +38,14 @@ L1:
 	if c2 == 0 {
 		if turn == 1 {
 			log.Printf("Process 1 waiting\n")
+			controller.OutsideCriticalSection(1, 50)
 			goto L1
 		}
 		c1 = 1
 	B1:
 		if turn == 2 {
 			log.Printf("Process 1 waiting\n")
+			controller.OutsideCriticalSection(1, 50)
 			goto B1
 		}
 		goto A1
@@ -70,12 +72,14 @@ L2:
 	if c1 == 0 {
 		if turn == 2 {
 			log.Printf("Process 2 waiting\n")
+			controller.OutsideCriticalSection(2, 50)
 			goto L2
 		}
 		c2 = 1
 	B2:
 		if turn == 1 {
 			log.Printf("Process 2 waiting\n")
+			controller.OutsideCriticalSection(2, 50)
 			goto B2
 		}
 		goto A2
