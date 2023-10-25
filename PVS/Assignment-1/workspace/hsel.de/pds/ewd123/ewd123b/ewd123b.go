@@ -36,14 +36,12 @@ L1:
 		log.Printf("Process 1 waiting \n")
 		goto L1
 	}
-
+	controller.OutsideCriticalSection(1, 5000)
 	c1 = 0
 	controller.EnterCriticalSection(1)
-	controller.InsideCriticalSection(1, 50)
+	controller.InsideCriticalSection(1, 50000)
 	controller.LeaveCriticalSection(1)
 	c1 = 1
-
-	controller.OutsideCriticalSection(1, 100)
 
 	if controller.ProcessCrashed(0.1) {
 		log.Printf("Process 1 crashed\n")
@@ -57,17 +55,15 @@ L1:
 func process2() {
 L2:
 	if c1 == 0 {
-		log.Printf("Process 2 waiting \n")
+		log.Printf("Process 2 waiting\n")
 		goto L2
 	}
-
+	controller.OutsideCriticalSection(2, 5000)
 	c2 = 0
 	controller.EnterCriticalSection(2)
-	controller.InsideCriticalSection(2, 50)
+	controller.InsideCriticalSection(2, 50000)
 	controller.LeaveCriticalSection(2)
 	c2 = 1
-
-	controller.OutsideCriticalSection(2, 100)
 
 	if controller.ProcessCrashed(0.1) {
 		log.Printf("Process 2 crashed\n")
