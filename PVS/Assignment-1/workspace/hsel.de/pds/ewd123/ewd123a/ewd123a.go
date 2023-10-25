@@ -34,6 +34,7 @@ func process1() {
 L1:
 	if turn == 2 {
 		log.Printf("Process 1 waiting\n")
+		controller.OutsideCriticalSection(1, 10)
 		goto L1
 	}
 
@@ -58,6 +59,7 @@ func process2() {
 L2:
 	if turn == 1 {
 		log.Printf("Process 2 waiting\n")
+		controller.OutsideCriticalSection(2, 10)
 		goto L2
 	}
 
