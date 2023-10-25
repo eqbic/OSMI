@@ -51,7 +51,7 @@ L1:
 		goto A1
 	}
 	controller.EnterCriticalSection(1)
-	controller.InsideCriticalSection(1, 50)
+	controller.InsideCriticalSection(1, 500)
 	controller.LeaveCriticalSection(1)
 
 	turn = 2
@@ -85,7 +85,7 @@ L2:
 		goto A2
 	}
 	controller.EnterCriticalSection(2)
-	controller.InsideCriticalSection(2, 50)
+	controller.InsideCriticalSection(2, 500)
 	controller.LeaveCriticalSection(2)
 
 	turn = 1
