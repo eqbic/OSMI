@@ -31,12 +31,14 @@ func Start() {
 
 // process1 simulates the behaviour of the first process
 func process1() {
-A1:
+L1:
 	c1 = 0
 
-L1:
+	controller.OutsideCriticalSection(1, 5000)
+
 	if c2 == 0 {
-		log.Printf("Process 1 waiting \n")
+		log.Printf("Process 1 waiting\n")
+		controller.OutsideCriticalSection(1, 50)
 		goto L1
 	}
 
@@ -46,39 +48,37 @@ L1:
 
 	c1 = 1
 
-	controller.OutsideCriticalSection(1, 100)
-
 	if controller.ProcessCrashed(0.1) {
 		log.Printf("Process 1 crashed\n")
 		return
 	}
 
-	goto A1
+	goto L1
 }
 
 // process2 simulates the behaviour of the second process
 func process2() {
-A2:
+L2:
 	c2 = 0
 
-L2:
+	controller.OutsideCriticalSection(2, 5000)
+
 	if c1 == 0 {
-		log.Printf("Process 2 waiting \n")
+		log.Printf("Process 2 waiting\n")
+		controller.OutsideCriticalSection(2, 50)
 		goto L2
 	}
 
-	controller.EnterCriticalSection(2)
-	controller.InsideCriticalSection(2, 50)
-	controller.LeaveCriticalSection(2)
+	controller.EnterCriticalSection(1)
+	controller.InsideCriticalSection(1, 50)
+	controller.LeaveCriticalSection(1)
 
 	c2 = 1
-
-	controller.OutsideCriticalSection(2, 100)
 
 	if controller.ProcessCrashed(0.1) {
 		log.Printf("Process 2 crashed\n")
 		return
 	}
 
-	goto A2
+	goto L2
 }
