@@ -57,7 +57,7 @@ L1:
 	turn = 2
 	c1 = 1
 
-	if controller.ProcessCrashed(0.1) {
+	if controller.ProcessCrashed(0.01) {
 		log.Printf("Process 1 crashed\n")
 		return
 	}
@@ -91,7 +91,7 @@ L2:
 	turn = 1
 	c2 = 1
 
-	if controller.ProcessCrashed(0.1) {
+	if controller.ProcessCrashed(0.8) {
 		log.Printf("Process 2 crashed\n")
 		return
 	}
