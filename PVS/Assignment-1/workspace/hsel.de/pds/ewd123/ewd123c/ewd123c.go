@@ -34,11 +34,10 @@ func process1() {
 L1:
 	c1 = 0
 
-	controller.OutsideCriticalSection(1, 5000)
+	controller.OutsideCriticalSection(1, 500)
 
 	if c2 == 0 {
 		log.Printf("Process 1 waiting\n")
-		controller.OutsideCriticalSection(1, 50)
 		goto L1
 	}
 
@@ -61,11 +60,10 @@ func process2() {
 L2:
 	c2 = 0
 
-	controller.OutsideCriticalSection(2, 5000)
+	controller.OutsideCriticalSection(2, 500)
 
 	if c1 == 0 {
 		log.Printf("Process 2 waiting\n")
-		controller.OutsideCriticalSection(2, 50)
 		goto L2
 	}
 
