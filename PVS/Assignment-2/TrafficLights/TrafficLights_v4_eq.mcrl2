@@ -1,0 +1,72 @@
+sort
+  	CardinalDirection = struct north | east | south | west; % 4 directions
+	Axis = struct northSouth | eastWest; % 2 axis along north-sout and east-west
+  
+map
+	axis: CardinalDirection -> Axis;
+	next: CardinalDirection -> CardinalDirection;
+
+eqn
+	axis(north) = northSouth;
+	axis(east) = eastWest;
+	axis(south) = northSouth;
+	axis(west) = eastWest;
+
+	next(north) = east;
+	next(east) = south;
+	next(south) = west;
+	next(west) = north;
+
+sort
+	Colour = struct red | yellow | green; % 3 colors which each trafficlight can have
+
+map
+	next: Colour -> Colour; % defines the color cycle
+	
+eqn
+	next(red) = green;
+	next(green) = yellow;
+	next(yellow) = red;
+
+act
+	show : CardinalDirection # Colour; % show the current color of the given trafficlight direction
+	wasShown: Axis;
+	
+proc
+	TrafficLight(d: CardinalDirection) = 
+	% north-south axis starts, east-west axis has to wait to take over control
+	(d == north || d == south) -> TrafficLight(d, green) <> waitDirection(d) . TrafficLight(d, red);
+	
+
+	TrafficLight(d: CardinalDirection, c: Colour)=
+	% show light and synchronize, if light is red, handover control, synchronize and get it back, finally continue with next colour
+	show(d,c) . wasShown(axis(d)) . (c == red) -> nextDirection(next(d)) . waitDirection(d) . TrafficLight(d, next(c)) <> TrafficLight(d, next(c));
+	
+act
+	nextDirection: CardinalDirection;
+	waitDirection: CardinalDirection;
+	axisWasShown: Axis;
+	changeDirection: CardinalDirection;
+
+proc
+	Crossing = 
+		hide({
+			axisWasShown,
+			changeDirection
+		},
+		allow({
+			show,
+			axisWasShown,
+			changeDirection
+		},
+		comm({
+			waitDirection | nextDirection -> changeDirection,
+			wasShown | wasShown -> axisWasShown
+		},
+			TrafficLight(north) || TrafficLight(east) || TrafficLight(south) || TrafficLight(west)
+		)))	
+;
+    
+init
+	Crossing;
+	
