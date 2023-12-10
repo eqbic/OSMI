@@ -51,11 +51,15 @@ L1:
 		goto A1
 	}
 	controller.EnterCriticalSection(1)
-	controller.InsideCriticalSection(1, 500)
+	controller.InsideCriticalSection(1, 50)
 	controller.LeaveCriticalSection(1)
+
+	controller.OutsideCriticalSection(1, 50)
 
 	turn = 2
 	c1 = 1
+
+	controller.OutsideCriticalSection(1, 50)
 
 	if controller.ProcessCrashed(0.1) {
 		log.Printf("Process 1 crashed\n")
@@ -85,11 +89,15 @@ L2:
 		goto A2
 	}
 	controller.EnterCriticalSection(2)
-	controller.InsideCriticalSection(2, 500)
+	controller.InsideCriticalSection(2, 50)
 	controller.LeaveCriticalSection(2)
+
+	controller.OutsideCriticalSection(2, 50)
 
 	turn = 1
 	c2 = 1
+
+	controller.OutsideCriticalSection(2, 50)
 
 	if controller.ProcessCrashed(0.6) {
 		log.Printf("Process 2 crashed\n")
