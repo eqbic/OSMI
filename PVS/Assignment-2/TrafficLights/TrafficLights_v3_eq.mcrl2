@@ -35,6 +35,7 @@ proc
 
 
 
+
 %-------------------------------------------
 % Definition of a system consisting of four trafficlights
 %-------------------------------------------
@@ -49,10 +50,10 @@ proc
 		(!safe(n,e,s,w)) 
 			-> intersectionUnsafe(n,e,s,w)
 			<> sum c: Colour, d: CardinalDirection . receive(d, next(c)) .
-				(d == north) -> Monitor(next(c), e, s, w) <>
-				(d == east) -> Monitor(n, next(c), s, w) <>
-				(d == south) -> Monitor(n, e, next(c), w) <>
-				(d == west) -> Monitor(n, e, s, next(c));
+				(d == north && e == red && w == red) -> receive(north, c) . Monitor(n = c) <>
+				(d == east && n == red && s == red) -> receive(east, c) . Monitor(e = c) <>
+				(d == south && e == red && w == red) -> receive(south, c) . Monitor(s = c) <>
+				(d == west && n == red && s == red) -> receive(west, c) . Monitor(w = c);
 	
 	Intersection = 
 		allow({colourSeen, intersectionUnsafe}, comm({show | receive -> colourSeen},
