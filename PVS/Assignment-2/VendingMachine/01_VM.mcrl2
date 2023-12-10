@@ -66,12 +66,13 @@ proc
 	;
 
 	ReturnChange(credit : Int) = 
-		(credit >= value(Euro)) -> return(Euro) . ReturnChange(credit - value(Euro))
-    		+ ((credit < value(Euro)) && (credit >= value(_50c))) -> return(_50c) . ReturnChange(credit - value(_50c))
-    		+ ((credit < value(_50c)) && (credit >= value(_20c))) -> return(_20c) . ReturnChange(credit - value(_20c))
-    		+ ((credit < value(_20c)) && (credit >= value(_10c))) -> return(_10c) . ReturnChange(credit - value(_10c))
-    		+ ((credit < value(_10c)) && (credit >= value(_5c))) -> return(_5c) . ReturnChange(credit - value(_5c))
-    		+ (credit < value(_5c)) -> tau . VendingMachine
+		(credit >= value(Euro)) 
+		-> return(Euro) . ReturnChange(credit - value(Euro))
+    		<> ((credit < value(Euro)) && (credit >= value(_50c))) -> return(_50c) . ReturnChange(credit - value(_50c))
+    		<> ((credit < value(_50c)) && (credit >= value(_20c))) -> return(_20c) . ReturnChange(credit - value(_20c))
+    		<> ((credit < value(_20c)) && (credit >= value(_10c))) -> return(_10c) . ReturnChange(credit - value(_10c))
+    		<> ((credit < value(_10c)) && (credit >= value(_5c))) -> return(_5c) . ReturnChange(credit - value(_5c))
+    		<> (credit < value(_5c)) -> tau . VendingMachine
 ;
 % -----------------------------------------------------------------------------------------------------------------------
 
