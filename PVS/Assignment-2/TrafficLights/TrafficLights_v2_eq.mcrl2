@@ -1,0 +1,67 @@
+sort
+	CardinalDirection = struct north | east | south | west; % 4 directions
+
+sort
+	Colour = struct red | green | yellow; % 3 colors which each traffic light can have
+
+map
+	next: Colour -> Colour;
+	safe: Colour # Colour # Colour # Colour -> Bool;
+
+var
+	n: Colour;
+	e: Colour;
+	s: Colour;
+	w: Colour;
+
+eqn
+	next(red) = green;
+	next(green) = yellow;
+	next(yellow) = red;
+
+	% it is safe if trafficlights on different axis are not yellow or green at the same time
+	safe(n,e,s,w) = !((!(n in {red}) || !(s in {red})) && (!(w in {red}) || !(e in {red}))); 
+
+
+%------------------------------------------
+% definition of a trafficlight
+%------------------------------------------
+act
+  show : CardinalDirection # Colour; % show the color which the given trafficlight currently has
+
+proc
+	% shows the current color and change to next color
+	TrafficLight(d: CardinalDirection, c: Colour) = show(d, c). TrafficLight(d, next(c));
+
+
+
+%-------------------------------------------
+% Definition of a system consisting of four trafficlights
+%-------------------------------------------
+
+act
+	receive: CardinalDirection # Colour;
+	intersectionUnsafe: Colour # Colour # Colour # Colour;
+	colourSeen: CardinalDirection # Colour;
+
+proc
+	Monitor(n: Colour, e: Colour, s: Colour, w: Colour) =
+		(!safe(n,e,s,w)) 
+			-> intersectionUnsafe(n,e,s,w)
+			<> sum c: Colour, d: CardinalDirection . receive(d, next(c)) .
+				(d == north) -> Monitor(next(c), e, s, w) <>
+				(d == east) -> Monitor(n, next(c), s, w) <>
+				(d == south) -> Monitor(n, e, next(c), w) <>
+				(d == west) -> Monitor(n, e, s, next(c));
+	
+	Intersection = 
+		allow({colourSeen, intersectionUnsafe}, comm({show | receive -> colourSeen},
+			TrafficLight(north, red) 
+			|| TrafficLight(east, red) 
+			|| TrafficLight(south, red) 
+			|| TrafficLight(west, red)
+			|| Monitor(red, red, red, red)));
+
+
+init
+	Intersection;
