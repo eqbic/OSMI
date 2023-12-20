@@ -1,0 +1,30 @@
+sort
+  CardinalDirection = struct north | east | south | west; % 4 directions
+  
+sort
+	Colour = struct red | green | yellow; % 3 colors which each traffic light can have
+
+map
+	next: Colour -> Colour;
+
+
+eqn
+	next(red) = green;
+	next(green) = yellow;
+	next(yellow) = red;
+
+
+%------------------------------------------
+% definition of a trafficlight
+%------------------------------------------
+act
+  show : CardinalDirection # Colour; % show the color which the given trafficlight currently has
+
+proc
+	% shows the current color and change to next color
+	TrafficLight(d: CardinalDirection, c: Colour) = show(d, c). TrafficLight(d, next(c));
+
+%-------------------------------------------
+% Definition of a system consisting of four trafficlights
+init
+	TrafficLight(north, red) || TrafficLight(east, red) || TrafficLight(south, red) || TrafficLight(west, red);
