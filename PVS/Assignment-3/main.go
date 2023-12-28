@@ -88,72 +88,76 @@ func (t *TrafficLight) Run(wg *sync.WaitGroup) {
 	defer wg.Done()
 	for {
 		currentAxis := <-t.axisChannel
-		currentColor := <-t.colorChannel
 		isFirstReady := <-t.firstReady
 		isSecondReady := <-t.secondReady
 
+		// if currentAxis == axis(t.direction) {
+		// 	t.axisChannel <- axis(t.direction)
+		// 	// i am the first trafficlight to change color
+		// 	if !t.isReady && !isFirstReady {
+		// 		t.isReady = true
+		// 		t.colour = nextColour(t.colour)
+		// 		t.colorChannel <- t.colour
+		// 		t.firstReady <- true
+		// 	} else {
+		// 		t.colorChannel <- currentColor
+		// 		t.firstReady <- isFirstReady
+		// 	}
+
+		// 	// // i am the second trafficlight to change color
+		// 	if !t.isReady && isFirstReady {
+		// 		t.isReady = true
+		// 		t.colour = currentColor
+		// 		t.secondReady <- true
+		// 	} else {
+		// 		t.secondReady <- isSecondReady
+		// 	}
+
+		// 	// axis is ready
+		// 	if isFirstReady && isSecondReady {
+		// 		t.Show()
+		// 	}
+
+		// 	// t.firstReady <- isFirstReady
+		// 	// t.secondReady <- isSecondReady
+
+		// } else {
+		// }
+
 		if currentAxis == axis(t.direction) {
-			t.axisChannel <- axis(t.direction)
-			// i am the first trafficlight to change color
-			if !t.isReady && !isFirstReady {
-				t.isReady = true
+			if !t.isReady {
 				t.colour = nextColour(t.colour)
-				t.colorChannel <- t.colour
-				t.firstReady <- true
-			} else {
-				t.colorChannel <- currentColor
-				t.firstReady <- isFirstReady
 			}
-
-			// // i am the second trafficlight to change color
-			if !t.isReady && isFirstReady {
-				t.isReady = true
-				t.colour = currentColor
-				t.secondReady <- true
-			} else {
-				t.secondReady <- isSecondReady
-			}
-
-			// axis is ready
-			if isFirstReady && isSecondReady {
-				t.Show()
-			}
-
-			// t.firstReady <- isFirstReady
-			// t.secondReady <- isSecondReady
 
 		} else {
 			t.axisChannel <- currentAxis
-			t.colorChannel <- currentColor
 			t.firstReady <- isFirstReady
 			t.secondReady <- isSecondReady
 		}
+
 	}
 }
 
 func main() {
 	var wg sync.WaitGroup
 	axisChannel := make(chan Axis)
-	colorChannel := make(chan Colour)
 	firstReady := make(chan bool)
 	secondReady := make(chan bool)
 	for i := North; i <= West; i++ {
 		wg.Add(1)
 		trafficLight := TrafficLight{
-			direction:    i,
-			colour:       Red,
-			axisChannel:  axisChannel,
-			colorChannel: colorChannel,
-			isReady:      false,
-			firstReady:   firstReady,
-			secondReady:  secondReady,
+			direction:   i,
+			colour:      Red,
+			axisChannel: axisChannel,
+			isReady:     false,
+			firstReady:  firstReady,
+			secondReady: secondReady,
 		}
 		go trafficLight.Run(&wg)
 	}
 
 	go func() {
 		axisChannel <- NorthSouth
-		colorChannel <- Red
 		firstReady <- false
 		secondReady <- false
 	}()
