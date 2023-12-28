@@ -237,8 +237,6 @@ func (t *TrafficLight) Run(wg *sync.WaitGroup) {
 		isSecondReady := <-t.secondReady
 
 		if currentAxis == axis(t.direction) {
-			t.Show()
-
 			t.axisChannel <- axis(t.direction)
 			// i am the first trafficlight to change color
 			if !t.isReady && !isFirstReady {
@@ -258,6 +256,11 @@ func (t *TrafficLight) Run(wg *sync.WaitGroup) {
 				t.secondReady <- true
 			} else {
 				t.secondReady <- isSecondReady
+			}
+
+			// axis is ready
+			if isFirstReady && isSecondReady {
+				t.Show()
 			}
 
 			// t.firstReady <- isFirstReady
