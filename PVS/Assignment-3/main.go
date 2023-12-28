@@ -71,13 +71,12 @@ func axis(direction CardinalDirection) Axis {
 }
 
 type TrafficLight struct {
-	direction    CardinalDirection
-	colour       Colour
-	axisChannel  chan Axis
-	colorChannel chan Colour
-	isReady      bool
-	firstReady   chan bool
-	secondReady  chan bool
+	direction         CardinalDirection
+	colour            Colour
+	axisChannel       chan Axis
+	trafficLightShown bool
+	amountReady       chan int
+	axisShown         chan bool
 }
 
 func (t *TrafficLight) Show() {
@@ -87,79 +86,71 @@ func (t *TrafficLight) Show() {
 func (t *TrafficLight) Run(wg *sync.WaitGroup) {
 	defer wg.Done()
 	for {
+		currentAmountReady := <-t.amountReady
+		currentAxisShown := <-t.axisShown
 		currentAxis := <-t.axisChannel
-		isFirstReady := <-t.firstReady
-		isSecondReady := <-t.secondReady
-
-		// if currentAxis == axis(t.direction) {
-		// 	t.axisChannel <- axis(t.direction)
-		// 	// i am the first trafficlight to change color
-		// 	if !t.isReady && !isFirstReady {
-		// 		t.isReady = true
-		// 		t.colour = nextColour(t.colour)
-		// 		t.colorChannel <- t.colour
-		// 		t.firstReady <- true
-		// 	} else {
-		// 		t.colorChannel <- currentColor
-		// 		t.firstReady <- isFirstReady
-		// 	}
-
-		// 	// // i am the second trafficlight to change color
-		// 	if !t.isReady && isFirstReady {
-		// 		t.isReady = true
-		// 		t.colour = currentColor
-		// 		t.secondReady <- true
-		// 	} else {
-		// 		t.secondReady <- isSecondReady
-		// 	}
-
-		// 	// axis is ready
-		// 	if isFirstReady && isSecondReady {
-		// 		t.Show()
-		// 	}
-
-		// 	// t.firstReady <- isFirstReady
-		// 	// t.secondReady <- isSecondReady
-
-		// } else {
-		// }
+		t.Show()
 
 		if currentAxis == axis(t.direction) {
-			if !t.isReady {
-				t.colour = nextColour(t.colour)
+			if !t.trafficLightShown {
+				if !currentAxisShown {
+					t.colour = nextColour(t.colour)
+					t.trafficLightShown = true
+					currentAmountReady := currentAmountReady + 1
+					t.amountReady <- currentAmountReady
+				} else {
+					t.amountReady <- currentAmountReady
+				}
+			} else {
+				if !currentAxisShown {
+					t.amountReady <- currentAmountReady
+				} else {
+					t.trafficLightShown = false
+					currentAmountReady := currentAmountReady - 1
+					t.amountReady <- currentAmountReady
+				}
 			}
 
-		} else {
-			t.axisChannel <- currentAxis
-			t.firstReady <- isFirstReady
-			t.secondReady <- isSecondReady
-		}
+			if currentAmountReady == 0 {
+				t.axisShown <- false
+			} else if currentAmountReady > 1 {
+				t.axisShown <- true
+			} else {
+				t.axisShown <- currentAxisShown
+			}
 
+			t.axisChannel <- currentAxis
+
+		} else {
+			t.amountReady <- currentAmountReady
+			t.axisShown <- currentAxisShown
+			t.axisChannel <- currentAxis
+		}
 	}
 }
 
 func main() {
 	var wg sync.WaitGroup
 	axisChannel := make(chan Axis)
-	firstReady := make(chan bool)
-	secondReady := make(chan bool)
+	amountReady := make(chan int)
+	axisShown := make(chan bool)
 	for i := North; i <= West; i++ {
 		wg.Add(1)
 		trafficLight := TrafficLight{
-			direction:   i,
-			colour:      Red,
-			axisChannel: axisChannel,
-			isReady:     false,
-			firstReady:  firstReady,
-			secondReady: secondReady,
+			direction:         i,
+			colour:            Red,
+			axisChannel:       axisChannel,
+			trafficLightShown: false,
+			amountReady:       amountReady,
+			axisShown:         axisShown,
 		}
 		go trafficLight.Run(&wg)
 	}
 
 	go func() {
+		amountReady <- 0
+		axisShown <- false
 		axisChannel <- NorthSouth
-		firstReady <- false
-		secondReady <- false
 	}()
 	wg.Wait()
 }
