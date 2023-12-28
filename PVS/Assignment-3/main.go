@@ -71,12 +71,14 @@ func axis(direction CardinalDirection) Axis {
 }
 
 type TrafficLight struct {
-	direction         CardinalDirection
-	colour            Colour
-	axisChannel       chan Axis
-	trafficLightShown bool
-	amountReady       chan int
-	axisShown         chan bool
+	direction               CardinalDirection
+	colour                  Colour
+	axisChannel             chan Axis
+	trafficLightShown       bool
+	amountReady             chan int
+	axisShown               chan bool
+	amountChange            chan int
+	readyForDirectionChange bool
 }
 
 func (t *TrafficLight) Show() {
@@ -87,27 +89,42 @@ func (t *TrafficLight) Run(wg *sync.WaitGroup) {
 	defer wg.Done()
 	for {
 		currentAmountReady := <-t.amountReady
+		currentAmountChange := <-t.amountChange
 		currentAxisShown := <-t.axisShown
 		currentAxis := <-t.axisChannel
-		t.Show()
 
-		if currentAxis == axis(t.direction) {
+		// fmt.Printf("Direction: %s, AmountReady: %d, AmountChange: %d, ReadyChange: %t\n", t.direction, currentAmountReady, currentAmountChange, t.readyForDirectionChange)
+		if currentAxis == axis(t.direction) && !t.readyForDirectionChange {
 			if !t.trafficLightShown {
 				if !currentAxisShown {
 					t.colour = nextColour(t.colour)
+					t.Show()
 					t.trafficLightShown = true
-					currentAmountReady := currentAmountReady + 1
+					currentAmountReady = currentAmountReady + 1
 					t.amountReady <- currentAmountReady
+					currentAmountChange = 0
+					t.amountChange <- currentAmountChange
 				} else {
 					t.amountReady <- currentAmountReady
+					t.amountChange <- currentAmountChange
 				}
 			} else {
 				if !currentAxisShown {
 					t.amountReady <- currentAmountReady
+					t.amountChange <- currentAmountChange
 				} else {
 					t.trafficLightShown = false
-					currentAmountReady := currentAmountReady - 1
+					currentAmountReady = currentAmountReady - 1
 					t.amountReady <- currentAmountReady
+
+					if t.colour == Red {
+						t.readyForDirectionChange = true
+						currentAmountChange = currentAmountChange + 1
+						t.amountChange <- currentAmountChange
+					} else {
+						t.readyForDirectionChange = false
+						t.amountChange <- 0
+					}
 				}
 			}
 
@@ -119,11 +136,16 @@ func (t *TrafficLight) Run(wg *sync.WaitGroup) {
 				t.axisShown <- currentAxisShown
 			}
 
-			t.axisChannel <- currentAxis
-
 		} else {
 			t.amountReady <- currentAmountReady
+			t.amountChange <- currentAmountChange
 			t.axisShown <- currentAxisShown
+			t.readyForDirectionChange = false
+		}
+
+		if currentAmountChange == 2 {
+			t.axisChannel <- axis(nextDirection(t.direction))
+		} else {
 			t.axisChannel <- currentAxis
 		}
 	}
@@ -134,21 +156,25 @@ func main() {
 	axisChannel := make(chan Axis)
 	amountReady := make(chan int)
 	axisShown := make(chan bool)
+	amountChange := make(chan int)
 	for i := North; i <= West; i++ {
 		wg.Add(1)
 		trafficLight := TrafficLight{
-			direction:         i,
-			colour:            Red,
-			axisChannel:       axisChannel,
-			trafficLightShown: false,
-			amountReady:       amountReady,
-			axisShown:         axisShown,
+			direction:               i,
+			colour:                  Red,
+			axisChannel:             axisChannel,
+			trafficLightShown:       false,
+			amountReady:             amountReady,
+			axisShown:               axisShown,
+			amountChange:            amountChange,
+			readyForDirectionChange: false,
 		}
 		go trafficLight.Run(&wg)
 	}
 
 	go func() {
 		amountReady <- 0
+		amountChange <- 0
 		axisShown <- false
 		axisChannel <- NorthSouth
 	}()
