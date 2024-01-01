@@ -61,17 +61,18 @@ func (color Colour) String() string {
 }
 
 // helper constants to avoid magic numbers
-const number_of_directions CardinalDirection = 4
-const number_of_colors Colour = 3
+const numberOfDirections CardinalDirection = 4
+const numberOfColors Colour = 3
+const numberTrafficlightsPerAxis = 2
 
 // returns next direction of given direction: North->East->South->West
 func nextDirection(direction CardinalDirection) CardinalDirection {
-	return (direction + 1) % number_of_directions
+	return (direction + 1) % numberOfDirections
 }
 
 // return next color of given color: Red->Green->Yellow
 func nextColour(color Colour) Colour {
-	return (color + 1) % number_of_colors
+	return (color + 1) % numberOfColors
 }
 
 // helper method to get the axis which the given direction is on
@@ -84,14 +85,14 @@ func axis(direction CardinalDirection) Axis {
 
 // custom type which describes a trafficlight
 type TrafficLight struct {
-	direction                       CardinalDirection
-	colour                          Colour
-	activeAxis                      chan Axis
-	trafficLightShown               bool
-	numberTrafficlightsChangedColor chan int
-	axisShown                       chan bool
-	numberTrafficlightsChangedAxis  chan int
-	readyForDirectionChange         bool
+	direction                           CardinalDirection
+	colour                              Colour
+	activeAxis                          chan Axis
+	trafficLightShown                   bool
+	numberTrafficlightsChangedColor     chan int
+	axisShown                           chan bool
+	numberTrafficlightsChangedDirection chan int
+	readyForDirectionChange             bool
 }
 
 // prints the current color of the traffic light
@@ -102,42 +103,53 @@ func (t *TrafficLight) Show() {
 func (t *TrafficLight) Run(wg *sync.WaitGroup) {
 	defer wg.Done()
 	for {
-
+		// read current values from channels
 		numberTrafficlightsChangedColor := <-t.numberTrafficlightsChangedColor
-		numberTrafficlightsChangedAxis := <-t.numberTrafficlightsChangedAxis
+		numberTrafficlightsChangedDirection := <-t.numberTrafficlightsChangedDirection
 		axisShown := <-t.axisShown
 		activeAxis := <-t.activeAxis
 
+		// only consider trafficlight if it is part of the active axis
 		if activeAxis == axis(t.direction) && !t.readyForDirectionChange {
+			// the current trafficlight has not changed color yet
 			if !t.trafficLightShown {
 				if !axisShown {
+					// change color to next color and show it
 					t.colour = nextColour(t.colour)
 					t.Show()
+					// mark that this trafficlight has changed color
 					t.trafficLightShown = true
+					// increase the amount of trafficlights which already changed the color and write to channel
 					numberTrafficlightsChangedColor = numberTrafficlightsChangedColor + 1
 					t.numberTrafficlightsChangedColor <- numberTrafficlightsChangedColor
-					numberTrafficlightsChangedAxis = 0
-					t.numberTrafficlightsChangedAxis <- numberTrafficlightsChangedAxis
+					numberTrafficlightsChangedDirection = 0
+					t.numberTrafficlightsChangedDirection <- numberTrafficlightsChangedDirection
 				} else {
 					t.numberTrafficlightsChangedColor <- numberTrafficlightsChangedColor
-					t.numberTrafficlightsChangedAxis <- numberTrafficlightsChangedAxis
+					t.numberTrafficlightsChangedDirection <- numberTrafficlightsChangedDirection
 				}
 			} else {
 				if !axisShown {
+					// this trafficlight already changed the color. waiting for the second trafficlight
 					t.numberTrafficlightsChangedColor <- numberTrafficlightsChangedColor
-					t.numberTrafficlightsChangedAxis <- numberTrafficlightsChangedAxis
+					t.numberTrafficlightsChangedDirection <- numberTrafficlightsChangedDirection
 				} else {
+					// both trafficlights have already changed the color. each trafficlight resets the shown flag and
+					// decrease the number of trafficlights which already changed color and writes this value to the channel.
 					t.trafficLightShown = false
 					numberTrafficlightsChangedColor = numberTrafficlightsChangedColor - 1
 					t.numberTrafficlightsChangedColor <- numberTrafficlightsChangedColor
 
+					// if the current color is red its time for a direction change. the trafficlights sets the direction
+					// change flag to true and increases the number of trafficlights which are ready for a change and writes
+					// to the channels.
 					if t.colour == Red {
 						t.readyForDirectionChange = true
-						numberTrafficlightsChangedAxis = numberTrafficlightsChangedAxis + 1
-						t.numberTrafficlightsChangedAxis <- numberTrafficlightsChangedAxis
+						numberTrafficlightsChangedDirection = numberTrafficlightsChangedDirection + 1
+						t.numberTrafficlightsChangedDirection <- numberTrafficlightsChangedDirection
 					} else {
 						t.readyForDirectionChange = false
-						t.numberTrafficlightsChangedAxis <- 0
+						t.numberTrafficlightsChangedDirection <- 0
 					}
 				}
 			}
@@ -151,13 +163,15 @@ func (t *TrafficLight) Run(wg *sync.WaitGroup) {
 			}
 
 		} else {
+			// the trafficlight is not on the active axis. it just writes the read values back to the channels.
 			t.numberTrafficlightsChangedColor <- numberTrafficlightsChangedColor
-			t.numberTrafficlightsChangedAxis <- numberTrafficlightsChangedAxis
+			t.numberTrafficlightsChangedDirection <- numberTrafficlightsChangedDirection
 			t.axisShown <- axisShown
 			t.readyForDirectionChange = false
 		}
 
-		if numberTrafficlightsChangedAxis == 2 {
+		// if all trafficlights on the active axis are ready to change directions, set active axis to next axis
+		if numberTrafficlightsChangedDirection == numberTrafficlightsPerAxis {
 			t.activeAxis <- axis(nextDirection(t.direction))
 		} else {
 			t.activeAxis <- activeAxis
@@ -174,25 +188,26 @@ func main() {
 	// channel to communicate whether all trafficlights on the active axis have shown the current color.
 	axisShown := make(chan bool)
 	// channel to communicate the number of trafficlights which already changed the active axis.
-	numberTrafficlightsChangedAxis := make(chan int)
+	numberTrafficlightsChangedDirection := make(chan int)
+	// create trafficlights for each direction and call Run for each as goroutine.
 	for i := North; i <= West; i++ {
 		wg.Add(1)
 		trafficLight := TrafficLight{
-			direction:                       i,
-			colour:                          Red,
-			activeAxis:                      activeAxis,
-			trafficLightShown:               false,
-			numberTrafficlightsChangedColor: numberTrafficlightsChangedColor,
-			axisShown:                       axisShown,
-			numberTrafficlightsChangedAxis:  numberTrafficlightsChangedAxis,
-			readyForDirectionChange:         false,
+			direction:                           i,
+			colour:                              Red,
+			activeAxis:                          activeAxis,
+			trafficLightShown:                   false,
+			numberTrafficlightsChangedColor:     numberTrafficlightsChangedColor,
+			axisShown:                           axisShown,
+			numberTrafficlightsChangedDirection: numberTrafficlightsChangedDirection,
+			readyForDirectionChange:             false,
 		}
 		go trafficLight.Run(&wg)
 	}
-
+	// init the system and set acitve axis to north-south.
 	go func() {
 		numberTrafficlightsChangedColor <- 0
-		numberTrafficlightsChangedAxis <- 0
+		numberTrafficlightsChangedDirection <- 0
 		axisShown <- false
 		activeAxis <- NorthSouth
 	}()
