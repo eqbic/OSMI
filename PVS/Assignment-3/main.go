@@ -60,6 +60,7 @@ func (color Colour) String() string {
 	}
 }
 
+// helper constants to avoid magic numbers
 const number_of_directions CardinalDirection = 4
 const number_of_colors Colour = 3
 
@@ -103,7 +104,6 @@ func (t *TrafficLight) Run(wg *sync.WaitGroup) {
 		currentAxisShown := <-t.axisShown
 		currentAxis := <-t.axisChannel
 
-		// fmt.Printf("Direction: %s, AmountReady: %d, AmountChange: %d, ReadyChange: %t\n", t.direction, currentAmountReady, currentAmountChange, t.readyForDirectionChange)
 		if currentAxis == axis(t.direction) && !t.readyForDirectionChange {
 			if !t.trafficLightShown {
 				if !currentAxisShown {
