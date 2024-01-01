@@ -9,6 +9,7 @@ type CardinalDirection int
 type Axis int
 type Colour int
 
+// enum to describe different cardinal directions
 const (
 	North CardinalDirection = iota
 	East
@@ -16,6 +17,7 @@ const (
 	West
 )
 
+// helper method to print direction as string
 func (direction CardinalDirection) String() string {
 	switch direction {
 	case North:
@@ -31,17 +33,20 @@ func (direction CardinalDirection) String() string {
 	}
 }
 
+// enum to describe axis
 const (
 	NorthSouth Axis = iota
 	EastWest
 )
 
+// enum to describe color
 const (
 	Red Colour = iota
 	Green
 	Yellow
 )
 
+// helper method to print color as string
 func (color Colour) String() string {
 	switch color {
 	case Red:
@@ -55,12 +60,17 @@ func (color Colour) String() string {
 	}
 }
 
-func nextDirection(cur CardinalDirection) CardinalDirection {
-	return (cur + 1) % 4
+const number_of_directions CardinalDirection = 4
+const number_of_colors Colour = 3
+
+// returns next direction of given direction: North->East->South->West
+func nextDirection(direction CardinalDirection) CardinalDirection {
+	return (direction + 1) % number_of_directions
 }
 
-func nextColour(cur Colour) Colour {
-	return (cur + 1) % 3
+// return next color of given color: Red->Green->Yellow
+func nextColour(color Colour) Colour {
+	return (color + 1) % number_of_colors
 }
 
 func axis(direction CardinalDirection) Axis {
