@@ -74,6 +74,7 @@ func nextColour(color Colour) Colour {
 	return (color + 1) % number_of_colors
 }
 
+// helper method to get the axis which the given direction is on
 func axis(direction CardinalDirection) Axis {
 	if direction == North || direction == South {
 		return NorthSouth
@@ -81,17 +82,19 @@ func axis(direction CardinalDirection) Axis {
 	return EastWest
 }
 
+// custom type which describes a trafficlight
 type TrafficLight struct {
-	direction               CardinalDirection
-	colour                  Colour
-	axisChannel             chan Axis
-	trafficLightShown       bool
-	amountReady             chan int
-	axisShown               chan bool
-	amountChange            chan int
-	readyForDirectionChange bool
+	direction                       CardinalDirection
+	colour                          Colour
+	activeAxis                      chan Axis
+	trafficLightShown               bool
+	numberTrafficlightsChangedColor chan int
+	axisShown                       chan bool
+	numberTrafficlightsChangedAxis  chan int
+	readyForDirectionChange         bool
 }
 
+// prints the current color of the traffic light
 func (t *TrafficLight) Show() {
 	fmt.Printf("%s is %s.\n", t.direction, t.colour)
 }
@@ -99,94 +102,99 @@ func (t *TrafficLight) Show() {
 func (t *TrafficLight) Run(wg *sync.WaitGroup) {
 	defer wg.Done()
 	for {
-		currentAmountReady := <-t.amountReady
-		currentAmountChange := <-t.amountChange
-		currentAxisShown := <-t.axisShown
-		currentAxis := <-t.axisChannel
 
-		if currentAxis == axis(t.direction) && !t.readyForDirectionChange {
+		numberTrafficlightsChangedColor := <-t.numberTrafficlightsChangedColor
+		numberTrafficlightsChangedAxis := <-t.numberTrafficlightsChangedAxis
+		axisShown := <-t.axisShown
+		activeAxis := <-t.activeAxis
+
+		if activeAxis == axis(t.direction) && !t.readyForDirectionChange {
 			if !t.trafficLightShown {
-				if !currentAxisShown {
+				if !axisShown {
 					t.colour = nextColour(t.colour)
 					t.Show()
 					t.trafficLightShown = true
-					currentAmountReady = currentAmountReady + 1
-					t.amountReady <- currentAmountReady
-					currentAmountChange = 0
-					t.amountChange <- currentAmountChange
+					numberTrafficlightsChangedColor = numberTrafficlightsChangedColor + 1
+					t.numberTrafficlightsChangedColor <- numberTrafficlightsChangedColor
+					numberTrafficlightsChangedAxis = 0
+					t.numberTrafficlightsChangedAxis <- numberTrafficlightsChangedAxis
 				} else {
-					t.amountReady <- currentAmountReady
-					t.amountChange <- currentAmountChange
+					t.numberTrafficlightsChangedColor <- numberTrafficlightsChangedColor
+					t.numberTrafficlightsChangedAxis <- numberTrafficlightsChangedAxis
 				}
 			} else {
-				if !currentAxisShown {
-					t.amountReady <- currentAmountReady
-					t.amountChange <- currentAmountChange
+				if !axisShown {
+					t.numberTrafficlightsChangedColor <- numberTrafficlightsChangedColor
+					t.numberTrafficlightsChangedAxis <- numberTrafficlightsChangedAxis
 				} else {
 					t.trafficLightShown = false
-					currentAmountReady = currentAmountReady - 1
-					t.amountReady <- currentAmountReady
+					numberTrafficlightsChangedColor = numberTrafficlightsChangedColor - 1
+					t.numberTrafficlightsChangedColor <- numberTrafficlightsChangedColor
 
 					if t.colour == Red {
 						t.readyForDirectionChange = true
-						currentAmountChange = currentAmountChange + 1
-						t.amountChange <- currentAmountChange
+						numberTrafficlightsChangedAxis = numberTrafficlightsChangedAxis + 1
+						t.numberTrafficlightsChangedAxis <- numberTrafficlightsChangedAxis
 					} else {
 						t.readyForDirectionChange = false
-						t.amountChange <- 0
+						t.numberTrafficlightsChangedAxis <- 0
 					}
 				}
 			}
 
-			if currentAmountReady == 0 {
+			if numberTrafficlightsChangedColor == 0 {
 				t.axisShown <- false
-			} else if currentAmountReady > 1 {
+			} else if numberTrafficlightsChangedColor > 1 {
 				t.axisShown <- true
 			} else {
-				t.axisShown <- currentAxisShown
+				t.axisShown <- axisShown
 			}
 
 		} else {
-			t.amountReady <- currentAmountReady
-			t.amountChange <- currentAmountChange
-			t.axisShown <- currentAxisShown
+			t.numberTrafficlightsChangedColor <- numberTrafficlightsChangedColor
+			t.numberTrafficlightsChangedAxis <- numberTrafficlightsChangedAxis
+			t.axisShown <- axisShown
 			t.readyForDirectionChange = false
 		}
 
-		if currentAmountChange == 2 {
-			t.axisChannel <- axis(nextDirection(t.direction))
+		if numberTrafficlightsChangedAxis == 2 {
+			t.activeAxis <- axis(nextDirection(t.direction))
 		} else {
-			t.axisChannel <- currentAxis
+			t.activeAxis <- activeAxis
 		}
 	}
 }
 
 func main() {
 	var wg sync.WaitGroup
-	axisChannel := make(chan Axis)
-	amountReady := make(chan int)
+	// channel to synchronize the current active axis
+	activeAxis := make(chan Axis)
+	// channel to communicate the number of trafficlights which already changed the color (0, 1 or 2)
+	numberTrafficlightsChangedColor := make(chan int)
+	// channel to communicate whether all trafficlights on the active axis have shown the current color.
 	axisShown := make(chan bool)
-	amountChange := make(chan int)
+	// channel to communicate the number of trafficlights which already changed the active axis.
+	numberTrafficlightsChangedAxis := make(chan int)
 	for i := North; i <= West; i++ {
 		wg.Add(1)
 		trafficLight := TrafficLight{
-			direction:               i,
-			colour:                  Red,
-			axisChannel:             axisChannel,
-			trafficLightShown:       false,
-			amountReady:             amountReady,
-			axisShown:               axisShown,
-			amountChange:            amountChange,
-			readyForDirectionChange: false,
+			direction:                       i,
+			colour:                          Red,
+			activeAxis:                      activeAxis,
+			trafficLightShown:               false,
+			numberTrafficlightsChangedColor: numberTrafficlightsChangedColor,
+			axisShown:                       axisShown,
+			numberTrafficlightsChangedAxis:  numberTrafficlightsChangedAxis,
+			readyForDirectionChange:         false,
 		}
 		go trafficLight.Run(&wg)
 	}
 
 	go func() {
-		amountReady <- 0
-		amountChange <- 0
+		numberTrafficlightsChangedColor <- 0
+		numberTrafficlightsChangedAxis <- 0
 		axisShown <- false
-		axisChannel <- NorthSouth
+		activeAxis <- NorthSouth
 	}()
 	wg.Wait()
 }
